@@ -1,0 +1,7 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+Reference [IMPLEMENTATION.md](mdc:IMPLEMENTATION.md) for our implementation plan and todos.
+Reference [DOCUMENTATION.md](mdc:DOCUMENTATION.md) for details of how our tools work.

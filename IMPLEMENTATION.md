@@ -97,4 +97,9 @@ This document outlines the steps to build a structured, interactive, and navigab
 2. **Chapterization Logic (with tests and UI)**
 3. **Navigation & Presentation (with tests and UI)**
 4. **Interactive Chessboard & Branching (with tests and UI)**
-5. **Advanced Features (Branch Map, Caching, etc., with tests and UI)** 
+5. **Advanced Features (Branch Map, Caching, etc., with tests and UI)**
+
+---
+
+## 6. Out of Scope
+- Multi-game PGN files: Only single-game PGN files are supported. The application will not handle or display multiple games from a single PGN file. 
