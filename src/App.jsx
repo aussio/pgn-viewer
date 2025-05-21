@@ -1,17 +1,17 @@
 import { useState } from 'react'
 import { parsePgn } from './pgnParser'
 import styles from './App.module.css'
+import MoveTreeFlow from './MoveTreeFlow'
+import { moveTreeFromPgn } from './moveTreeFromPgn'
 
-const defaultPgn = `[Event "Friendly Match"]
-[Site "New Braunfels Chess Club"]
-[Date "2023.11.03"]
-[White "Alice"]
-[Black "Bob"]
-[Result "1-0"]
+const defaultPgn = `[Event "Variation Test"]
+[Site "Test"]
+[Date "2023.01.01"]
+[White "White"]
+[Black "Black"]
+[Result "*"]
 
-1. e4 e5 2. Nf3 f6? {Weakening kingside, exposing Black to danger} 
-3. Nxe5! fxe5?? {Loses immediately} 
-4. Qh5+ Ke7 5. Qxe5# {Quick checkmate} 1-0
+1. e4 (1. d4 d5 2. c4) e5 2. Nf3 Nc6 3. Bb5 a6 *
 `;
 
 function App() {
@@ -34,6 +34,15 @@ function App() {
     }
   }
 
+  let moveTree = null
+  if (parsed) {
+    try {
+      moveTree = moveTreeFromPgn(parsed)
+    } catch {
+      // Do nothing, moveTree remains null
+    }
+  }
+
   return (
     <div className={styles.app}>
       <h1>PGN Viewer</h1>
@@ -52,6 +61,12 @@ function App() {
         <h2>Parsed Output</h2>
         <pre className={styles.pre}>{parsed ? JSON.stringify(parsed, null, 2) : ''}</pre>
       </div>
+      {moveTree && (
+        <div>
+          <h2>Move Tree Visualization</h2>
+          <MoveTreeFlow moveTree={moveTree} />
+        </div>
+      )}
     </div>
   )
 }

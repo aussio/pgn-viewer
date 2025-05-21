@@ -12,6 +12,8 @@
   },
   "dependencies": {
     "@mliebelt/pgn-parser": "^1.4.18",
+    "@xyflow/react": "^12.6.4",
+    "chess.js": "^1.2.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },

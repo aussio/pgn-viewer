@@ -8,21 +8,32 @@ This document outlines the steps to build a structured, interactive, and navigab
 ## 1. PGN Parsing & Move Tree Structure (Vertical Slice)
 
 ### 1.1. Integrate PGN Parser
-- [ ] Add @mliebelt/pgn-parser to the project dependencies.
-- [ ] Create a utility to parse raw PGN files into structured JSON.
-- [ ] **Write tests** for PGN parsing utility (unit tests for various PGN inputs).
-- [ ] **Implement a basic UI** to upload or input a PGN file and display the parsed JSON (for developer feedback/testing).
+- [x] Add @mliebelt/pgn-parser to the project dependencies.
+- [x] Create a utility to parse raw PGN files into structured JSON.
+- [x] **Write tests** for PGN parsing utility (unit tests for various PGN inputs).
+- [x] **Implement a basic UI** to upload or input a PGN file and display the parsed JSON (for developer feedback/testing).
 
 ### 1.2. Build Move Tree Structure
-- [ ] Design a custom move tree class (inspired by TreeModel.js) for chess moves.
-- [ ] Each node should store:
+- [x] Design a custom move tree class (inspired by TreeModel.js) for chess moves.
+- [x] Each node should store:
   - FEN string
   - Move details (notation, move number, annotations)
   - Child moves (variations)
   - Unique identifier
-- [ ] Implement conversion from parsed PGN JSON to the move tree structure.
-- [ ] **Write tests** for move tree construction (unit tests for tree correctness, edge cases, and variations).
-- [ ] **Implement a UI** to visualize the move tree structure (e.g., expandable/collapsible tree view for moves/variations).
+- [x] Implement conversion from parsed PGN JSON to the move tree structure.
+- [x] **Write tests** for move tree construction (unit tests for tree correctness, edge cases, and variations).
+- [x] **Implement a UI** to visualize the move tree structure (e.g., expandable/collapsible tree view for moves/variations).
+
+### 1.3. Move Tree Visualization with React Flow
+- [ ] Add @xyflow/react (React Flow) to the project dependencies.
+- [ ] Write a utility to convert the MoveTree structure into React Flow nodes and edges.
+- [ ] Create a MoveTreeFlow.jsx component that renders the move tree using <ReactFlow />.
+- [ ] Customize node rendering to show move notation, FEN, and annotations.
+- [ ] Visually distinguish mainline and variation branches (e.g., node/edge styles).
+- [ ] Enable panning, zooming, and dragging in the visualizer.
+- [ ] Allow clicking nodes to show move details and sync with the chessboard.
+- [ ] (Optional) Add minimap, controls, or theming using React Flow features.
+- [ ] **Write tests** for the data transformation utility and basic UI rendering.
 
 ---
 

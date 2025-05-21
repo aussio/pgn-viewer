@@ -13,14 +13,42 @@ const simplePgn = `
 1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 1/2-1/2
 `;
 
+const pgnWithVariation = `
+[Event "Variation Test"]
+[Site "Test"]
+[Date "2023.01.01"]
+[White "White"]
+[Black "Black"]
+[Result "*"]
+
+1. e4 (1. d4 d5 2. c4) e5 2. Nf3 Nc6 3. Bb5 a6 *
+`;
+
 describe('parsePgn', () => {
     it('parses a simple PGN string', () => {
         const result = parsePgn(simplePgn);
-        console.log('PGN parse result:', JSON.stringify(result, null, 2));
         expect(Array.isArray(result)).toBe(true);
         expect(result.length).toBe(1);
         expect(result[0].tags.White).toBe('Fischer, Robert J.');
         expect(result[0].moves[0].notation.notation).toBe('e4');
+    });
+
+    it('parses a PGN with a root-level variation', () => {
+        const result = parsePgn(pgnWithVariation);
+        expect(Array.isArray(result)).toBe(true);
+        expect(result.length).toBe(1);
+        const moves = result[0].moves;
+        // Mainline first move
+        expect(moves[0].notation.notation).toBe('e4');
+        // Variation on first move
+        expect(Array.isArray(moves[0].variations)).toBe(true);
+        expect(moves[0].variations.length).toBe(1);
+        const variation = moves[0].variations[0];
+        expect(variation[0].notation.notation).toBe('d4');
+        expect(variation[1].notation.notation).toBe('d5');
+        expect(variation[2].notation.notation).toBe('c4');
+        // Mainline continues
+        expect(moves[1].notation.notation).toBe('e5');
     });
 
     it('returns an empty array for empty input', () => {
