@@ -18,6 +18,7 @@ function App() {
   const [pgn, setPgn] = useState(defaultPgn)
   const [parsed, setParsed] = useState(null)
   const [error, setError] = useState(null)
+  const [showParsedJson, setShowParsedJson] = useState(false)
 
   const handleInputChange = (e) => {
     setPgn(e.target.value)
@@ -26,8 +27,13 @@ function App() {
   const handleParse = () => {
     try {
       const result = parsePgn(pgn)
-      setParsed(result)
-      setError(null)
+      if (!result || result.length === 0) {
+        setParsed(null)
+        setError('Failed to parse PGN.')
+      } else {
+        setParsed(result)
+        setError(null)
+      }
     } catch {
       setParsed(null)
       setError('Failed to parse PGN.')
@@ -56,11 +62,21 @@ function App() {
       />
       <br />
       <button className={styles.button} onClick={handleParse}>Parse PGN</button>
+      {parsed && (
+        <button
+          className={`${styles.button} ${styles.parsedJsonButton}`}
+          onClick={() => setShowParsedJson(v => !v)}
+          type="button"
+        >
+          Parsed JSON
+        </button>
+      )}
+      {showParsedJson && parsed && (
+        <div className={styles.parsedJsonSection}>
+          <pre className={styles.pre}>{JSON.stringify(parsed, null, 2)}</pre>
+        </div>
+      )}
       {error && <div className={styles.error}>{error}</div>}
-      <div className={styles.parsedContainer}>
-        <h2>Parsed Output</h2>
-        <pre className={styles.pre}>{parsed ? JSON.stringify(parsed, null, 2) : ''}</pre>
-      </div>
       {moveTree && (
         <div>
           <h2>Move Tree Visualization</h2>
