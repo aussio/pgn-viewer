@@ -114,6 +114,7 @@ This document outlines the steps to build a structured, interactive, and navigab
 ## 6. Cool additional ideas
 - Significance Algorithm
 - [ ] Use the lichess API (https://explorer.lichess.ovh/lichess?variant=standard) to send a FEN and get back the most common next moves.
+- [ ] Gifs of the lines moving (with whatever the print-supported placeholder would be)
 
 # Out of Scope
 - Multi-game PGN files: Only single-game PGN files are supported. The application will not handle or display multiple games from a single PGN file.
