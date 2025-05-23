@@ -55,13 +55,12 @@ describe('moveTreeToReactFlow', () => {
     it('converts a simple MoveTree to React Flow nodes and edges', () => {
         const tree = new MoveTree(simpleModel);
         const { nodes, edges } = moveTreeToReactFlow(tree);
-        // There should be 5 nodes (root + 4 moves)
-        expect(nodes.length).toBe(5);
-        // There should be 4 edges (one for each move from parent)
-        expect(edges.length).toBe(4);
-        // Node ids should match tree node ids
+        // There should be 4 nodes (e4, e5, Nf3, Nc6)
+        expect(nodes.length).toBe(4);
+        // There should be 3 edges (one for each move from parent)
+        expect(edges.length).toBe(3);
+        // Node ids should match tree node ids (excluding root)
         const nodeIds = nodes.map(n => n.id);
-        expect(nodeIds).toContain(tree.root.id);
         expect(nodeIds).toContain(tree.root.children[0].id);
         expect(nodeIds).toContain(tree.root.children[0].children[0].id);
         expect(nodeIds).toContain(tree.root.children[0].children[0].children[0].id);
@@ -76,10 +75,10 @@ describe('moveTreeToReactFlow', () => {
     it('converts a MoveTree with a variation to correct nodes and edges', () => {
         const tree = new MoveTree(variationModel);
         const { nodes, edges } = moveTreeToReactFlow(tree);
-        // There should be 7 nodes: root, e4, e5, Nf3, Nc6, f4, exf4
-        expect(nodes.length).toBe(7);
-        // There should be 6 edges (one for each move from parent)
-        expect(edges.length).toBe(6);
+        // There should be 6 nodes: e4, e5, Nf3, Nc6, f4, exf4 (root omitted)
+        expect(nodes.length).toBe(6);
+        // There should be 5 edges (one for each move from parent)
+        expect(edges.length).toBe(5);
         // Check that both mainline and variation moves are present
         const notations = nodes.map(n => n.data.notation);
         expect(notations).toContain('Nf3');
@@ -91,5 +90,13 @@ describe('moveTreeToReactFlow', () => {
             expect(nodes.map(n => n.id)).toContain(edge.source);
             expect(nodes.map(n => n.id)).toContain(edge.target);
         }
+    });
+
+    it('skips the root node (move: null) in the output nodes', () => {
+        const tree = new MoveTree(simpleModel);
+        const { nodes } = moveTreeToReactFlow(tree);
+        // The root node's id should not be present in the output nodes
+        const nodeIds = nodes.map(n => n.id);
+        expect(nodeIds).not.toContain(tree.root.id);
     });
 }); 
