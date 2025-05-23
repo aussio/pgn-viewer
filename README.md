@@ -1,8 +1,6 @@
 # PGN Viewer
 
-<img width="600" alt="image" src="https://github.com/
-user-attachments/assets/3a7f94f1-a3ee-44d6-8d75-fb79ddc415cc" /
->
+<img width="600" alt="image" src="https://github.com/user-attachments/assets/3a7f94f1-a3ee-44d6-8d75-fb79ddc415cc">
 
 PGN Viewer is a web app for visualizing chess games from PGN files. It parses PGN, displays the parsed JSON, and shows an interactive move tree using React Flow.
 

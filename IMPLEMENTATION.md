@@ -25,15 +25,15 @@ This document outlines the steps to build a structured, interactive, and navigab
 - [x] **Implement a UI** to visualize the move tree structure (e.g., expandable/collapsible tree view for moves/variations).
 
 ### 1.3. Move Tree Visualization with React Flow
-- [ ] Add @xyflow/react (React Flow) to the project dependencies.
-- [ ] Write a utility to convert the MoveTree structure into React Flow nodes and edges.
-- [ ] Create a MoveTreeFlow.jsx component that renders the move tree using <ReactFlow />.
+- [x] Add @xyflow/react (React Flow) to the project dependencies.
+- [x] Write a utility to convert the MoveTree structure into React Flow nodes and edges.
+- [x] Create a MoveTreeFlow.jsx component that renders the move tree using <ReactFlow />.
 - [ ] Customize node rendering to show move notation, FEN, and annotations.
-- [ ] Visually distinguish mainline and variation branches (e.g., node/edge styles).
-- [ ] Enable panning, zooming, and dragging in the visualizer.
+- [x] Visually distinguish mainline and variation branches (e.g., node/edge styles).
+- [x] Enable panning, zooming, and dragging in the visualizer.
 - [ ] Allow clicking nodes to show move details and sync with the chessboard.
-- [ ] (Optional) Add minimap, controls, or theming using React Flow features.
-- [ ] **Write tests** for the data transformation utility and basic UI rendering.
+- [x] (Optional) Add minimap, controls, or theming using React Flow features.
+- [x] **Write tests** for the data transformation utility and basic UI rendering.
 
 ---
 
@@ -111,6 +111,10 @@ This document outlines the steps to build a structured, interactive, and navigab
 5. **Advanced Features (Branch Map, Caching, etc., with tests and UI)**
 
 ---
+## 6. Cool additional ideas
+- Significance Algorithm
+- [ ] Use the lichess API (https://explorer.lichess.ovh/lichess?variant=standard) to send a FEN and get back the most common next moves.
+- [ ] Gifs of the lines moving (with whatever the print-supported placeholder would be)
 
-## 6. Out of Scope
-- Multi-game PGN files: Only single-game PGN files are supported. The application will not handle or display multiple games from a single PGN file. 
+# Out of Scope
+- Multi-game PGN files: Only single-game PGN files are supported. The application will not handle or display multiple games from a single PGN file.
