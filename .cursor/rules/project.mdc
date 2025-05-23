@@ -5,3 +5,33 @@ alwaysApply: true
 ---
 Reference [IMPLEMENTATION.md](mdc:IMPLEMENTATION.md) for our implementation plan and todos.
 Reference [DOCUMENTATION.md](mdc:DOCUMENTATION.md) for details of how our tools work.
+
+# File and Directory Organization
+* Pure JS/TS logic (not React components) must live in `src/lib`.
+* React components must live in `src/components`. If a component has multiple related files (e.g., styles, tests, helpers), group them in a subfolder (e.g., `src/components/MoveTreeFlow/`).
+* Pages must live in `src/pages`.
+* Do not use a top-level `utils` directory. Utility functions must be colocated with the component or feature that uses them.
+
+# Test Placement
+* Unit and component tests must be colocated with the file they test (e.g., `Component.jsx` and `Component.test.jsx` in the same folder).
+* Integration or end-to-end tests (if any) may live in a top-level `e2e/` or `integration/` directory.
+
+# Component and File Structure
+* When a component or feature has more than one related file (e.g., styles, helpers, tests), group them in a dedicated folder.
+* Use clear, descriptive names for files and folders.
+* Keep components focused and modular. Extract subcomponents or helpers as needed.
+
+# Documentation and Docstrings
+* All components, utilities, and major functions must have docstrings describing their purpose, props/parameters, and return values. Use a clear, consistent format for maximum AI compatibility.
+
+# CSS and Styling
+* CSS must always be in CSS modules, never in React JS/TSX files.
+
+# Imports
+* Use relative imports within folders for colocated files (e.g., `./moveTreeToReactFlow`).
+* Use clear, direct paths for cross-folder imports (e.g., `../lib/MoveTree`).
+
+# General Principles
+* Prefer colocating related files for discoverability and easier refactoring.
+* Keep the codebase modular and easy to navigate for both humans and AI tools.
+* Update documentation and rules as new patterns or best practices emerge.

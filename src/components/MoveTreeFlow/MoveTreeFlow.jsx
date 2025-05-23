@@ -1,19 +1,43 @@
 import React from 'react';
 import { ReactFlow, Controls, getSmoothStepPath, Handle, Position } from '@xyflow/react';
-import { moveTreeToReactFlow } from './utils/moveTreeToReactFlow';
+import { moveTreeToReactFlow } from './moveTreeToReactFlow';
 import styles from './MoveTreeFlow.module.css';
+
+/**
+ * MoveTreeFlow
+ *
+ * Visualizes a chess move tree using React Flow. Each move is a node, and variations are colored edges.
+ *
+ * Props:
+ *   moveTree: MoveTree - The move tree data structure to visualize (from lib/MoveTree).
+ *
+ * Usage:
+ *   <MoveTreeFlow moveTree={moveTree} />
+ */
 
 // Map piece notation to SVG filenames
 const pieceMap = {
   K: 'K', Q: 'Q', R: 'R', B: 'B', N: 'N', P: 'P',
 };
 
+/**
+ * getPieceType
+ *
+ * Returns the piece type (K, Q, R, B, N, P) from a move notation string.
+ * Defaults to 'P' (pawn) if not found.
+ */
 function getPieceType(notation) {
   if (!notation) return 'P'; // Default to pawn
   const first = notation[0];
   return pieceMap[first] ? first : 'P';
 }
 
+/**
+ * getToSquare
+ *
+ * Extracts the destination square (e.g., 'e4', 'f3') from a move notation string.
+ * Returns '' if not found.
+ */
 function getToSquare(notation) {
   if (!notation) return '';
   // e.g. e4, Nf3, exd5, Qxe5, etc. Find last two letters that are a square
@@ -21,6 +45,15 @@ function getToSquare(notation) {
   return match ? match[0] : '';
 }
 
+/**
+ * ChessMoveNode
+ *
+ * Custom node component for React Flow representing a chess move.
+ * Shows the piece, destination square, and uses SVGs for piece icons.
+ *
+ * Props:
+ *   data: { notation, turn, ... } - Node data from moveTreeToReactFlow.
+ */
 const ChessMoveNode = ({ data }) => {
   const { notation, turn } = data;
   const piece = getPieceType(notation);
@@ -28,7 +61,7 @@ const ChessMoveNode = ({ data }) => {
   const toSquare = getToSquare(notation);
   // Use import.meta.glob for Vite to import all SVGs
   const svgs = React.useMemo(() => {
-    const all = import.meta.glob('./assets/pieces/*.svg', { eager: true });
+    const all = import.meta.glob('/src/assets/pieces/*.svg', { eager: true });
     const map = {};
     Object.keys(all).forEach((path) => {
       const file = path.split('/').pop().replace('.svg', '');
@@ -51,6 +84,12 @@ const ChessMoveNode = ({ data }) => {
 
 const nodeTypes = { chessMove: ChessMoveNode };
 
+/**
+ * labelEdge
+ *
+ * Returns a label for an edge based on its variation index.
+ * Mainline edges have no label; variations are labeled 'Var N'.
+ */
 function labelEdge(edge) {
   const idx = edge.data?.variationIndex ?? 0;
   return idx === 0 ? '' : `Var ${idx}`;
@@ -71,7 +110,15 @@ const variationColors = [
   '#c62828', // strong red
 ];
 
-// Custom edge component with smooth curves and color per variation group
+/**
+ * ChessEdge
+ *
+ * Custom edge component for React Flow representing a chess move connection.
+ * Colors edges by variation group for clarity.
+ *
+ * Props:
+ *   id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, data - React Flow edge props.
+ */
 const ChessEdge = ({ id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, data }) => {
   const group = data?.variationGroup ?? 0;
   const style = group === 0
@@ -90,7 +137,12 @@ const ChessEdge = ({ id, sourceX, sourceY, targetX, targetY, sourcePosition, tar
   );
 };
 
-// Simple hash function for deterministic color assignment
+/**
+ * hashCode
+ *
+ * Simple hash function for deterministic color assignment to variation groups.
+ * Returns a 32-bit integer hash for a string.
+ */
 function hashCode(str) {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {

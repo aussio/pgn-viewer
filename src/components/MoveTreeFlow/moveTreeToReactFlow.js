@@ -2,9 +2,16 @@
 // Assumes MoveTree and MoveTreeNode as implemented in this project
 
 /**
- * Convert a MoveTree to React Flow nodes and edges.
- * @param {MoveTree} moveTree
- * @returns {{ nodes: Array, edges: Array }}
+ * moveTreeToReactFlow
+ *
+ * Converts a MoveTree (from lib/MoveTree) into React Flow nodes and edges for visualization.
+ * Skips the root node (move: null) and only includes actual moves.
+ *
+ * Parameters:
+ *   moveTree: MoveTree - The move tree data structure to convert.
+ *
+ * Returns:
+ *   { nodes: Array, edges: Array } - Arrays of React Flow nodes and edges.
  */
 export function moveTreeToReactFlow(moveTree) {
     const nodes = [];

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { MoveTree } from '../MoveTree';
+import { MoveTree } from '../../lib/MoveTree';
 import { moveTreeToReactFlow } from './moveTreeToReactFlow';
 
 // Simple tree: 1. e4 e5 2. Nf3 Nc6
