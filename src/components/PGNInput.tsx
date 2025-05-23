@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { parsePgn } from '../lib/pgnParser'
 import styles from '../App.module.css'
 import DebugPre from './DebugPre'
+import type { ParseTree } from '@mliebelt/pgn-parser'
 
 const defaultPgn = `[Event "Variation Test"]
 [Site "Test"]
@@ -20,21 +21,26 @@ const defaultPgn = `[Event "Variation Test"]
  *
  * Props:
  *   setParsed: function - Setter for parsed PGN data (lifts parsed state to parent).
- *   parsed: any - The parsed PGN data (used for debug display).
+ *   parsed: ParseTree | null - The parsed PGN data (used for debug display).
  */
-function PGNInput({ setParsed, parsed }) {
-  const [pgn, setPgn] = useState(defaultPgn)
-  const [error, setError] = useState(null)
-  const [showJson, setShowJson] = useState(false)
+type PGNInputProps = {
+  setParsed: (parsed: ParseTree | null) => void;
+  parsed: ParseTree | null;
+};
 
-  const handleInputChange = (e) => {
+function PGNInput({ setParsed, parsed }: PGNInputProps) {
+  const [pgn, setPgn] = useState<string>(defaultPgn)
+  const [error, setError] = useState<string | null>(null)
+  const [showJson, setShowJson] = useState<boolean>(false)
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setPgn(e.target.value)
   }
 
   const handleParse = () => {
     try {
       const result = parsePgn(pgn)
-      if (!result || result.length === 0) {
+      if (!result) {
         setParsed(null)
         setError('Failed to parse PGN.')
       } else {

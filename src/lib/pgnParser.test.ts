@@ -26,18 +26,14 @@ const pgnWithVariation = `
 
 describe('parsePgn', () => {
     it('parses a simple PGN string', () => {
-        const result = parsePgn(simplePgn);
-        expect(Array.isArray(result)).toBe(true);
-        expect(result.length).toBe(1);
-        expect(result[0].tags.White).toBe('Fischer, Robert J.');
-        expect(result[0].moves[0].notation.notation).toBe('e4');
+        const result = parsePgn(simplePgn)!;
+        expect(result.tags!.White).toBe('Fischer, Robert J.');
+        expect(result.moves[0].notation.notation).toBe('e4');
     });
 
     it('parses a PGN with a root-level variation', () => {
-        const result = parsePgn(pgnWithVariation);
-        expect(Array.isArray(result)).toBe(true);
-        expect(result.length).toBe(1);
-        const moves = result[0].moves;
+        const result = parsePgn(pgnWithVariation)!;
+        const moves = result.moves;
         // Mainline first move
         expect(moves[0].notation.notation).toBe('e4');
         // Variation on first move
@@ -51,15 +47,13 @@ describe('parsePgn', () => {
         expect(moves[1].notation.notation).toBe('e5');
     });
 
-    it('returns an empty array for empty input', () => {
+    it('returns null for empty input', () => {
         const result = parsePgn('');
-        expect(Array.isArray(result)).toBe(true);
-        expect(result.length).toBe(0);
+        expect(result).toBeNull();
     });
 
-    it('throws or returns empty for invalid PGN', () => {
-        // The parser is forgiving, so it may return an empty array
+    it('returns null for invalid PGN', () => {
         const result = parsePgn('not a pgn');
-        expect(Array.isArray(result)).toBe(true);
+        expect(result).toBeNull();
     });
 }); 

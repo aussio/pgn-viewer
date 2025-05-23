@@ -1,30 +1,31 @@
-import { MoveTree } from './MoveTree';
+import { MoveTree, MoveTreeNodeModel } from './MoveTree';
 import { Chess } from 'chess.js';
+import type { ParseTree } from '@mliebelt/pgn-parser';
 
 /**
  * Convert parsed PGN JSON (from @mliebelt/pgn-parser) to a MoveTree.
  * Only supports single-game PGN (first element of parsed array).
- * @param {object[]} parsedPgn - Output from parsePgn (array with one game object)
- * @returns {MoveTree}
+ * @param parsedPgn - Output from parsePgn (ParseTree)
+ * @returns MoveTree
  */
-export function moveTreeFromPgn(parsedPgn) {
-    if (!Array.isArray(parsedPgn) || parsedPgn.length === 0) {
+export function moveTreeFromPgn(parsedPgn: ParseTree): MoveTree {
+    if (!parsedPgn || !parsedPgn.moves || parsedPgn.moves.length === 0) {
         throw new Error('No game found in parsed PGN');
     }
-    const game = parsedPgn[0];
+    const game = parsedPgn;
     const chess = new Chess();
 
     // Recursive function to build tree nodes
-    function buildNodes(moves, parentFen) {
-        const nodes = [];
+    function buildNodes(moves: any[], parentFen: string): MoveTreeNodeModel[] {
+        const nodes: MoveTreeNodeModel[] = [];
         for (let i = 0; i < moves.length; i++) {
             const moveObj = moves[i];
             const chessCopy = new Chess(parentFen);
             if (moveObj.notation && moveObj.notation.notation) {
-                chessCopy.move(moveObj.notation.notation, { sloppy: true });
+                chessCopy.move(moveObj.notation.notation as string, undefined);
             }
             const fen = chessCopy.fen();
-            const node = {
+            const node: MoveTreeNodeModel = {
                 fen,
                 move: {
                     notation: moveObj.notation?.notation,
@@ -37,7 +38,7 @@ export function moveTreeFromPgn(parsedPgn) {
             };
             // Add mainline next move as a child
             if (i + 1 < moves.length) {
-                const nextNodes = buildNodes(moves.slice(i + 1), fen);
+                const nextNodes: MoveTreeNodeModel[] = buildNodes(moves.slice(i + 1), fen);
                 if (nextNodes.length > 0) node.children.push(...nextNodes);
             }
             // First push the mainline node
@@ -45,7 +46,7 @@ export function moveTreeFromPgn(parsedPgn) {
             // Then add variations as siblings (from the same parent FEN)
             if (moveObj.variations && moveObj.variations.length > 0) {
                 for (const variation of moveObj.variations) {
-                    const varNodes = buildNodes(variation, parentFen);
+                    const varNodes: MoveTreeNodeModel[] = buildNodes(variation, parentFen);
                     nodes.push(...varNodes);
                 }
             }
@@ -55,7 +56,7 @@ export function moveTreeFromPgn(parsedPgn) {
     }
 
     // Root node: before any moves, initial FEN
-    const root = {
+    const root: MoveTreeNodeModel = {
         fen: chess.fen(),
         move: null,
         children: [],

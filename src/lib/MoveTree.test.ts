@@ -63,8 +63,8 @@ describe('MoveTree and MoveTreeNode (chess-specific)', () => {
             ]
         };
         const tree = new MoveTree(model);
-        const fens = [];
-        tree.root.walk(node => fens.push(node.fen));
+        const fens: string[] = [];
+        tree.root.walk(node => fens.push(node.fen!));
         expect(fens).toEqual(['start', 'fen1', 'fen2', 'fen3']);
     });
 
@@ -93,7 +93,7 @@ describe('MoveTree and MoveTreeNode (chess-specific)', () => {
             ]
         };
         const tree = new MoveTree(model);
-        const node = tree.root.first(n => n.move && n.move.notation === 'e4');
+        const node = tree.root.first(n => n.move && n.move.notation === 'e4')!;
         expect(node.move.notation).toBe('e4');
         // Should be the first 'e4' in the tree
         expect(node).toBe(tree.root.children[0]);

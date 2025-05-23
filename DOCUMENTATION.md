@@ -129,4 +129,8 @@ This document describes the structure of the parsed PGN result as returned by th
 ## Notes
 - The root is an array (one element per game; this project only supports single-game PGNs).
 - Game metadata is under the `tags` property.
-- Moves are in the `moves` array, each with a `notation` object and other move details. 
+- Moves are in the `moves` array, each with a `notation` object and other move details.
+
+## Assistant Cursor Rules
+
+- When running tests from the chat, always use `npx vitest run` (non-interactive, no extra flags) to avoid configuration errors and ensure consistent results. 
