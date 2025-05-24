@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { parsePgn } from '../lib/pgnParser'
 import styles from '../App.module.css'
-import DebugPre from './DebugPre'
 import type { ParseTree } from '../types/pgn'
+import { useMoveTreeStore } from '../lib/store'
 
 const defaultPgn = `[Event "Braunfel Scotch: Main line opening"]
 [Result "*"]
@@ -33,7 +33,9 @@ type PGNInputProps = {
   parsed: ParseTree | null;
 };
 
-function PGNInput({ setParsed, parsed }: PGNInputProps) {
+function PGNInput() {
+  const setParsed = useMoveTreeStore(state => state.setParsed)
+  const parsed = useMoveTreeStore(state => state.parsed)
   const [pgn, setPgn] = useState<string>(defaultPgn)
   const [error, setError] = useState<string | null>(null)
 

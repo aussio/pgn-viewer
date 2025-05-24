@@ -10,6 +10,7 @@ import Breadcrumbs from '../components/Layout/Breadcrumbs'
 import Chessboard from '../components/Chessboard/Chessboard'
 import { MoveTree, MoveTreeNode } from '../lib/MoveTree'
 import styles from './HomePage.module.css'
+import { useMoveTreeStore } from '../lib/store'
 
 /**
  * HomePage
@@ -18,9 +19,12 @@ import styles from './HomePage.module.css'
  * @returns {JSX.Element} The rendered home page.
  */
 const HomePage: FC = () => {
-  const [parsed, setParsed] = useState<ParseTree | null>(null)
-  const [moveTree, setMoveTree] = useState<MoveTree | null>(null)
-  const [currentNode, setCurrentNode] = useState<MoveTreeNode | null>(null)
+  const parsed = useMoveTreeStore(state => state.parsed)
+  const setParsed = useMoveTreeStore(state => state.setParsed)
+  const moveTree = useMoveTreeStore(state => state.moveTree)
+  const setMoveTree = useMoveTreeStore(state => state.setMoveTree)
+  const currentNode = useMoveTreeStore(state => state.currentNode)
+  const setCurrentNode = useMoveTreeStore(state => state.setCurrentNode)
 
   // Update moveTree and reset currentNode when parsed changes
   React.useEffect(() => {
@@ -37,7 +41,7 @@ const HomePage: FC = () => {
       setMoveTree(null)
       setCurrentNode(null)
     }
-  }, [parsed])
+  }, [parsed, setMoveTree, setCurrentNode])
 
   // Step to next move (mainline only for now)
   function goNext() {
@@ -72,38 +76,20 @@ const HomePage: FC = () => {
     };
   }, [moveTree, currentNode]);
 
-  function handleNodeSelect(
-    nodeId: string,
-    moveTree: MoveTree | null,
-    setCurrentNode: (node: MoveTreeNode) => void
-  ): void {
-    if (!moveTree) return;
-    const newNode = MoveTreeNode.findById(moveTree.root, nodeId);
-    if (!newNode) return;
-    setCurrentNode(newNode);
-  }
-
   return (
     <BookLayout sidebar={<Sidebar />} breadcrumbs={<Breadcrumbs />}>
       <h1>PGN Viewer</h1>
-      <PGNInput
-        parsed={parsed}
-        setParsed={setParsed}
-      />
+      <PGNInput />
       {/* Placeholder for top-level buttons if needed */}
       <div className={styles.chessboardSection}>
-        <Chessboard fen={currentNode?.fen || ''} />
+        <Chessboard />
       </div>
       <div className={styles.controls}>
         <button onClick={goPrev} disabled={!currentNode?.parent}>Previous</button>
         <button onClick={goNext} disabled={!currentNode || currentNode.children.length === 0}>Next</button>
       </div>
       <div className={styles.moveTreeSection}>
-        {moveTree && <MoveTreeVisualization
-          moveTree={moveTree}
-          selectedNodeId={currentNode?.id}
-          onNodeSelect={nodeId => handleNodeSelect(nodeId, moveTree, setCurrentNode)}
-        />}
+        <MoveTreeVisualization />
       </div>
     </BookLayout>
   )

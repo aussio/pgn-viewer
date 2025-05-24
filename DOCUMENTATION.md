@@ -135,6 +135,33 @@ This document describes the structure of the parsed PGN result as returned by th
 Always prefer custom types defined in `src/types` (such as `ParseTree`, `PgnMove`, etc.) over types from third-party libraries. All code should use these custom types for consistency and accuracy, unless there is a strong, documented reason to do otherwise.
 `PgnMove` in `src/types` is the correct and canonical move type for this project. The `moveNumber` property is often `null` for black's moves, as this is how the parser typically returns the data.
 
+## State Management with Zustand
+
+This project uses [Zustand](https://github.com/pmndrs/zustand) for global state management. Zustand provides a simple, scalable, and modular way to manage application state outside of React component trees.
+
+### What Zustand Manages
+- The move tree structure (`moveTree`)
+- The currently selected move node (`currentNode`)
+- The parsed PGN data (`parsed`)
+- Selectors and actions for updating and accessing this state (e.g., `setMoveTree`, `setCurrentNode`, `setParsed`, and dynamic selectors like `getCurrentBranchGroup`)
+
+### Why Zustand?
+- Keeps board, move tree, and sidebar in sync across the app
+- Centralizes state for future editing features (add/edit/delete nodes, undo/redo, etc.)
+- Avoids prop drilling and makes state accessible from any component
+- Scales well as the app grows in complexity
+
+### Future Use
+Zustand will be used to manage all global state related to move tree editing, navigation, and UI synchronization. This includes supporting features like:
+- Editing the move tree (adding, deleting, or modifying moves/branches)
+- Undo/redo functionality
+- Keeping the chessboard, move tree graph, and sidebar in sync
+- Any other features that require shared state across multiple components
+
+### Component State Access Best Practice
+
+Leaf components (components that do not have children depending on their state) that need access to global state should use the Zustand store directly, rather than receiving state via props. This avoids unnecessary prop drilling, keeps components modular, and makes the codebase easier to maintain and extend. All new and refactored components should follow this pattern unless there is a strong, documented reason to do otherwise.
+
 ## Chessboard, Move Tree, and Graph Synchronization
 
 The HomePage component manages the current move node (`currentNode`) as the user steps through the game. This state is used to keep the chessboard and the move tree graph in sync:
