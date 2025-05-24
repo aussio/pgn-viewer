@@ -23,8 +23,8 @@ describe('MoveTree and MoveTreeNode (chess-specific)', () => {
     });
 
     it('addChild adds a child node with chess fields', () => {
-        const root = new MoveTreeNode({ fen: 'start', move: null });
-        const child = root.addChild({ fen: 'fen1', move: { notation: 'e4', moveNumber: 1 } });
+        const root = new MoveTreeNode({ fen: 'start', move: null, children: [] });
+        const child = root.addChild({ fen: 'fen1', move: { notation: 'e4', moveNumber: 1 }, children: [] });
         expect(root.children.length).toBe(1);
         expect(child.fen).toBe('fen1');
         expect(child.move.notation).toBe('e4');
@@ -33,9 +33,9 @@ describe('MoveTree and MoveTreeNode (chess-specific)', () => {
     });
 
     it('hasChildren returns true if node has children', () => {
-        const node = new MoveTreeNode({ fen: 'start', move: null, children: [{ fen: 'fen1', move: { notation: 'e4' } }] });
+        const node = new MoveTreeNode({ fen: 'start', move: null, children: [{ fen: 'fen1', move: { notation: 'e4' }, children: [] }] });
         expect(node.hasChildren()).toBe(true);
-        const leaf = new MoveTreeNode({ fen: 'fen2', move: { notation: 'e4' } });
+        const leaf = new MoveTreeNode({ fen: 'fen2', move: { notation: 'e4' }, children: [] });
         expect(leaf.hasChildren()).toBe(false);
     });
 
@@ -100,35 +100,35 @@ describe('MoveTree and MoveTreeNode (chess-specific)', () => {
     });
 
     it('generates unique ids for nodes if not provided', () => {
-        const node1 = new MoveTreeNode({ fen: 'f1', move: { notation: 'a' } });
-        const node2 = new MoveTreeNode({ fen: 'f2', move: { notation: 'b' } });
+        const node1 = new MoveTreeNode({ fen: 'f1', move: { notation: 'a' }, children: [] });
+        const node2 = new MoveTreeNode({ fen: 'f2', move: { notation: 'b' }, children: [] });
         expect(node1.id).not.toBe(node2.id);
         expect(typeof node1.id).toBe('string');
         expect(typeof node2.id).toBe('string');
     });
 
     it('uses provided id if given', () => {
-        const node = new MoveTreeNode({ fen: 'f', move: { notation: 'a' }, id: 'custom' });
+        const node = new MoveTreeNode({ fen: 'f', move: { notation: 'a' }, id: 'custom', children: [] });
         expect(node.id).toBe('custom');
     });
 
     it('sets parent and isRoot correctly', () => {
-        const parent = new MoveTreeNode({ fen: 'f', move: null });
-        const child = parent.addChild({ fen: 'c', move: { notation: 'b' } });
+        const parent = new MoveTreeNode({ fen: 'f', move: null, children: [] });
+        const child = parent.addChild({ fen: 'c', move: { notation: 'b' }, children: [] });
         expect(child.parent).toBe(parent);
         expect(parent.isRoot).toBeFalsy();
-        const root = new MoveTreeNode({ fen: 'root', move: null }, null, true);
+        const root = new MoveTreeNode({ fen: 'root', move: null, children: [] }, null, true);
         expect(root.isRoot).toBe(true);
     });
 
     it('all returns empty if no match', () => {
-        const node = new MoveTreeNode({ fen: 'f', move: { notation: 'a' } });
+        const node = new MoveTreeNode({ fen: 'f', move: { notation: 'a' }, children: [] });
         const result = node.all(n => n.move && n.move.notation === 'zzz');
         expect(result).toEqual([]);
     });
 
     it('first returns null if no match', () => {
-        const node = new MoveTreeNode({ fen: 'f', move: { notation: 'a' } });
+        const node = new MoveTreeNode({ fen: 'f', move: { notation: 'a' }, children: [] });
         const result = node.first(n => n.move && n.move.notation === 'zzz');
         expect(result).toBeNull();
     });

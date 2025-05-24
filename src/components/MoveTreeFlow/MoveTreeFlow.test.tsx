@@ -1,17 +1,17 @@
 import { describe, it, expect } from 'vitest';
 
 // --- Copied from MoveTreeFlow.jsx ---
-const pieceMap = {
+const pieceMap: Record<string, string> = {
   K: 'K', Q: 'Q', R: 'R', B: 'B', N: 'N', P: 'P',
 };
 
-function getPieceType(notation) {
+function getPieceType(notation: string | null): string {
   if (!notation) return 'P'; // Default to pawn
   const first = notation[0];
   return pieceMap[first] ? first : 'P';
 }
 
-function getToSquare(notation) {
+function getToSquare(notation: string | null): string {
   if (!notation) return '';
   const match = notation.match(/[a-h][1-8]$/);
   return match ? match[0] : '';

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { parsePgn } from '../lib/pgnParser'
 import styles from '../App.module.css'
 import DebugPre from './DebugPre'
-import type { ParseTree } from '@mliebelt/pgn-parser'
+import type { ParseTree } from '../types/pgn'
 
 const defaultPgn = `[Event "Variation Test"]
 [Site "Test"]

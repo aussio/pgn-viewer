@@ -131,6 +131,10 @@ This document describes the structure of the parsed PGN result as returned by th
 - Game metadata is under the `tags` property.
 - Moves are in the `moves` array, each with a `notation` object and other move details.
 
+## Project Type Rules
+- Always prefer custom types defined in `src/types` (such as `ParseTree`, `PgnMove`, etc.) over types from third-party libraries. All code should use these custom types for consistency and accuracy, unless there is a strong, documented reason to do otherwise.
+- `PgnMove` in `src/types` is the correct and canonical move type for this project. The `moveNumber` property is often `null` for black's moves, as this is how the parser typically returns the data.
+
 ## Assistant Cursor Rules
 
 - When running tests from the chat, always use `npx vitest run` (non-interactive, no extra flags) to avoid configuration errors and ensure consistent results. 

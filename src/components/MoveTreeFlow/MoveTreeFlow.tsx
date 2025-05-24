@@ -1,7 +1,10 @@
+import type { FC } from 'react';
 import React from 'react';
-import { ReactFlow, Controls, getSmoothStepPath, Handle, Position } from '@xyflow/react';
+import { ReactFlow, Controls, getSmoothStepPath, Handle, Position, Edge, Node } from '@xyflow/react';
 import { moveTreeToReactFlow } from './moveTreeToReactFlow';
 import styles from './MoveTreeFlow.module.css';
+import type { EdgeProps } from '@xyflow/react';
+import type { MoveTree } from '../../lib/MoveTree';
 
 /**
  * MoveTreeFlow
@@ -14,9 +17,12 @@ import styles from './MoveTreeFlow.module.css';
  * Usage:
  *   <MoveTreeFlow moveTree={moveTree} />
  */
+interface MoveTreeFlowProps {
+  moveTree: MoveTree;
+}
 
 // Map piece notation to SVG filenames
-const pieceMap = {
+const pieceMap: Record<string, string> = {
   K: 'K', Q: 'Q', R: 'R', B: 'B', N: 'N', P: 'P',
 };
 
@@ -26,7 +32,7 @@ const pieceMap = {
  * Returns the piece type (K, Q, R, B, N, P) from a move notation string.
  * Defaults to 'P' (pawn) if not found.
  */
-function getPieceType(notation) {
+function getPieceType(notation: string | null): string {
   if (!notation) return 'P'; // Default to pawn
   const first = notation[0];
   return pieceMap[first] ? first : 'P';
@@ -38,7 +44,7 @@ function getPieceType(notation) {
  * Extracts the destination square (e.g., 'e4', 'f3') from a move notation string.
  * Returns '' if not found.
  */
-function getToSquare(notation) {
+function getToSquare(notation: string | null): string {
   if (!notation) return '';
   // e.g. e4, Nf3, exd5, Qxe5, etc. Find last two letters that are a square
   const match = notation.match(/[a-h][1-8]$/);
@@ -54,18 +60,21 @@ function getToSquare(notation) {
  * Props:
  *   data: { notation, turn, ... } - Node data from moveTreeToReactFlow.
  */
-const ChessMoveNode = ({ data }) => {
+const ChessMoveNode: FC<{ data: any }> = ({ data }) => {
   const { notation, turn } = data;
   const piece = getPieceType(notation);
   const color = turn === 'w' ? 'w' : 'b';
   const toSquare = getToSquare(notation);
   // Use import.meta.glob for Vite to import all SVGs
   const svgs = React.useMemo(() => {
-    const all = import.meta.glob('/src/assets/pieces/*.svg', { eager: true });
-    const map = {};
+    // Fix for Vite import.meta.glob type error
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const all = import.meta.glob('/src/assets/pieces/*.svg', { eager: true }) as Record<string, { default: string }>;
+    const map: Record<string, string> = {};
     Object.keys(all).forEach((path) => {
-      const file = path.split('/').pop().replace('.svg', '');
-      map[file] = all[path].default;
+      const file = path.split('/').pop()?.replace('.svg', '');
+      if (file) map[file] = all[path].default;
     });
     return map;
   }, []);
@@ -90,7 +99,7 @@ const nodeTypes = { chessMove: ChessMoveNode };
  * Returns a label for an edge based on its variation index.
  * Mainline edges have no label; variations are labeled 'Var N'.
  */
-function labelEdge(edge) {
+function labelEdge(edge: Edge): string {
   const idx = edge.data?.variationIndex ?? 0;
   return idx === 0 ? '' : `Var ${idx}`;
 }
@@ -119,7 +128,7 @@ const variationColors = [
  * Props:
  *   id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, data - React Flow edge props.
  */
-const ChessEdge = ({ id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, data }) => {
+const ChessEdge: FC<EdgeProps> = ({ id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, data }) => {
   const group = data?.variationGroup ?? 0;
   const style = group === 0
     ? { stroke: '#111', strokeWidth: 3 }
@@ -143,7 +152,7 @@ const ChessEdge = ({ id, sourceX, sourceY, targetX, targetY, sourcePosition, tar
  * Simple hash function for deterministic color assignment to variation groups.
  * Returns a 32-bit integer hash for a string.
  */
-function hashCode(str) {
+function hashCode(str: string): number {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     hash = ((hash << 5) - hash) + str.charCodeAt(i);
@@ -154,7 +163,7 @@ function hashCode(str) {
 
 const edgeTypes = { chessEdge: ChessEdge };
 
-function MoveTreeFlow({ moveTree }) {
+const MoveTreeFlow: FC<MoveTreeFlowProps> = ({ moveTree }) => {
   if (!moveTree) return <div>No move tree to display.</div>;
   // Patch moveTreeToReactFlow to use 'chessMove' as node type and style edges
   const { nodes, edges } = moveTreeToReactFlow(moveTree);
@@ -178,6 +187,6 @@ function MoveTreeFlow({ moveTree }) {
       </ReactFlow>
     </div>
   );
-}
+};
 
 export default MoveTreeFlow; 

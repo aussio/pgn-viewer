@@ -13,9 +13,9 @@
  * Returns:
  *   { nodes: Array, edges: Array } - Arrays of React Flow nodes and edges.
  */
-export function moveTreeToReactFlow(moveTree) {
-    const nodes = [];
-    const edges = [];
+export function moveTreeToReactFlow(moveTree: any): { nodes: any[]; edges: any[] } {
+    const nodes: any[] = [];
+    const edges: any[] = [];
     const NODE_WIDTH = 80;
     const NODE_HEIGHT = 80;
     const X_SPACING = 180;
@@ -23,15 +23,22 @@ export function moveTreeToReactFlow(moveTree) {
 
     // Recursive layout: returns [nextY, centerY] for this node
     // variationGroup: 0 for mainline, unique for each variation branch
-    function traverse(node, parentId = null, depth = 0, variationIndex = 0, y = 0, variationGroup = 0) {
-        let myY = y;
-        let childYs = [];
-        let nextY = y;
+    function traverse(
+        node: any,
+        parentId: string | null = null,
+        depth: number = 0,
+        variationIndex: number = 0,
+        y: number = 0,
+        variationGroup: number | string = 0
+    ): [number, number] {
+        let myY: number = y;
+        let childYs: number[] = [];
+        let nextY: number = y;
         for (let i = 0; i < node.children.length; i++) {
             const child = node.children[i];
             // For mainline, keep parent's variationGroup; for variations, use their own index
             const childVariationGroup = (i === 0) ? variationGroup : child.id || `${parentId}-var${i}`;
-            const [newNextY, childCenterY] = traverse(child, node.id, depth + 1, i, nextY, childVariationGroup);
+            const [newNextY, childCenterY]: [number, number] = traverse(child, node.id, depth + 1, i, nextY, childVariationGroup);
             childYs.push(childCenterY);
             nextY = newNextY;
         }
@@ -65,15 +72,22 @@ export function moveTreeToReactFlow(moveTree) {
     }
 
     // Traverse from root, but skip adding the root node itself to nodes/edges
-    function traverseWithHiddenRoot(node, parentId = null, depth = 0, variationIndex = 0, y = 0, variationGroup = 0) {
+    function traverseWithHiddenRoot(
+        node: any,
+        parentId: string | null = null,
+        depth: number = 0,
+        variationIndex: number = 0,
+        y: number = 0,
+        variationGroup: number | string = 0
+    ): [number, number] {
         // If this is the root node (no move), don't add it, but traverse its children
         if (!node.move) {
-            let nextY = y;
-            let childYs = [];
+            let nextY: number = y;
+            let childYs: number[] = [];
             for (let i = 0; i < node.children.length; i++) {
                 const child = node.children[i];
                 const childVariationGroup = (i === 0) ? variationGroup : child.id || `root-var${i}`;
-                const [newNextY, childCenterY] = traverseWithHiddenRoot(child, null, 0, i, nextY, childVariationGroup);
+                const [newNextY, childCenterY]: [number, number] = traverseWithHiddenRoot(child, null, 0, i, nextY, childVariationGroup);
                 childYs.push(childCenterY);
                 nextY = newNextY;
             }

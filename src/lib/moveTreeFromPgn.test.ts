@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { moveTreeFromPgn } from './moveTreeFromPgn';
-import type { ParseTree, PgnMove } from '../types/pgn';
+import type { ParseTree } from '../types/pgn';
 
 // Minimal types for test data, only the fields used in test objects
 
@@ -41,7 +41,6 @@ const parsedWithVariation: TestParseTree = {
 
 describe('moveTreeFromPgn', () => {
     it('creates a MoveTree from a simple parsed PGN', () => {
-        // @ts-expect-error: test data intentionally uses minimal local type
         const tree = moveTreeFromPgn(parsedSimple as unknown as ParseTree);
         expect(tree.root.fen).toBeDefined();
         expect(tree.root.children.length).toBe(1);
@@ -61,14 +60,11 @@ describe('moveTreeFromPgn', () => {
 
     it('throws if no game is present', () => {
         const empty: TestParseTree = { moves: [] };
-        // @ts-expect-error: test data intentionally uses minimal local type
         expect(() => moveTreeFromPgn(empty as unknown as ParseTree)).toThrow();
-        // @ts-expect-error: test data intentionally uses minimal local type
         expect(() => moveTreeFromPgn(undefined as unknown as ParseTree)).toThrow();
     });
 
     it('handles variations as children', () => {
-        // @ts-expect-error: test data intentionally uses minimal local type
         const tree = moveTreeFromPgn(parsedWithVariation as unknown as ParseTree);
         const e4 = tree.root.children[0];
         expect(e4.move.notation).toBe('e4');
@@ -105,7 +101,6 @@ describe('moveTreeFromPgn', () => {
                 }
             ]
         };
-        // @ts-expect-error: test data intentionally uses minimal local type
         const tree = moveTreeFromPgn(parsed as unknown as ParseTree);
         const e4 = tree.root.children[0];
         expect(e4.move.notation).toBe('e4');
@@ -127,8 +122,7 @@ describe('moveTreeFromPgn', () => {
                     variations: []
                 }
             ]
-        };
-        // @ts-expect-error: test data intentionally uses minimal local type
+        };  
         const tree = moveTreeFromPgn(parsed as unknown as ParseTree);
         const e4 = tree.root.children[0];
         expect(Array.isArray(e4.children)).toBe(true);
@@ -158,7 +152,6 @@ describe('moveTreeFromPgn', () => {
                 }
             ]
         };
-        // @ts-expect-error: test data intentionally uses minimal local type
         const tree = moveTreeFromPgn(parsed as unknown as ParseTree);
         const e4 = tree.root.children[0];
         expect(e4.move.notation).toBe('e4');

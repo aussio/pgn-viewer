@@ -2,12 +2,13 @@
 // Source: https://github.com/joaonuno/tree-model-js/blob/master/index.js
 
 /**
- * The shape of a model object used to construct a MoveTreeNode.
+ * @internal
+ * Only for use in MoveTree construction and serialization. Do not use in app logic or UI.
  */
-export type MoveTreeNodeModel = {
+export type _MoveTreeNodeModel = {
     fen: string | null;
     move: any;
-    children: MoveTreeNodeModel[];
+    children: _MoveTreeNodeModel[];
     id?: string;
 };
 
@@ -22,7 +23,7 @@ class MoveTreeNode {
     isRoot: boolean;
     children: MoveTreeNode[];
 
-    constructor(model: MoveTreeNodeModel, parent: MoveTreeNode | null = null, isRoot: boolean = false) {
+    constructor(model: _MoveTreeNodeModel, parent: MoveTreeNode | null = null, isRoot: boolean = false) {
         // Chess-specific fields
         this.fen = model.fen || null;
         this.move = model.move || null; // {notation, moveNumber, annotations, etc.}

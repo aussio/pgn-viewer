@@ -35,3 +35,7 @@ Reference [DOCUMENTATION.md](mdc:DOCUMENTATION.md) for details of how our tools 
 * Prefer colocating related files for discoverability and easier refactoring.
 * Keep the codebase modular and easy to navigate for both humans and AI tools.
 * Update documentation and rules as new patterns or best practices emerge.
+
+# Type Usage
+* Always prefer custom types defined in `src/types` (such as `ParseTree`, `PgnMove`, etc.) over types from third-party libraries. All code should use these custom types for consistency and accuracy, unless there is a strong, documented reason to do otherwise.
+* `PgnMove` in `src/types` is the correct and canonical move type for this project. The `moveNumber` property is often `null` for black's moves, as this is how the parser typically returns the data.
