@@ -74,23 +74,21 @@ const HomePage: FC = () => {
 
   return (
     <BookLayout sidebar={<Sidebar />} breadcrumbs={<Breadcrumbs />}>
-      <div className={styles.container}>
-        <h1>PGN Viewer</h1>
-        <PGNInput
-          parsed={parsed}
-          setParsed={setParsed}
-        />
-        {/* Placeholder for top-level buttons if needed */}
-        <div className={styles.chessboardSection}>
-          <Chessboard fen={currentNode?.fen || ''} />
-        </div>
-        <div className={styles.controls}>
-          <button onClick={goPrev} disabled={!currentNode?.parent}>Previous</button>
-          <button onClick={goNext} disabled={!currentNode || currentNode.children.length === 0}>Next</button>
-        </div>
-        <div className={styles.moveTreeSection}>
-          {moveTree && <MoveTreeVisualization moveTree={moveTree} selectedNodeId={currentNode?.id} />}
-        </div>
+      <h1>PGN Viewer</h1>
+      <PGNInput
+        parsed={parsed}
+        setParsed={setParsed}
+      />
+      {/* Placeholder for top-level buttons if needed */}
+      <div className={styles.chessboardSection}>
+        <Chessboard fen={currentNode?.fen || ''} />
+      </div>
+      <div className={styles.controls}>
+        <button onClick={goPrev} disabled={!currentNode?.parent}>Previous</button>
+        <button onClick={goNext} disabled={!currentNode || currentNode.children.length === 0}>Next</button>
+      </div>
+      <div className={styles.moveTreeSection}>
+        {moveTree && <MoveTreeVisualization moveTree={moveTree} selectedNodeId={currentNode?.id} />}
       </div>
     </BookLayout>
   )

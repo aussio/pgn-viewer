@@ -31,7 +31,6 @@ type PGNInputProps = {
 function PGNInput({ setParsed, parsed }: PGNInputProps) {
   const [pgn, setPgn] = useState<string>(defaultPgn)
   const [error, setError] = useState<string | null>(null)
-  const [showJson, setShowJson] = useState<boolean>(false)
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setPgn(e.target.value)
@@ -63,12 +62,9 @@ function PGNInput({ setParsed, parsed }: PGNInputProps) {
         className={styles.textarea}
       />
       <br />
-      <button className={styles.button} onClick={handleParse}>Parse PGN</button>
-      <DebugPre
-        jsonData={parsed}
-        showJson={showJson}
-        setShowJson={setShowJson}
-      />
+      <div className={styles.controls}>
+        <button className={styles.button} onClick={handleParse}>Parse PGN</button>
+      </div>
       {error && <div className={styles.error}>{error}</div>}
     </>
   )
