@@ -1,79 +1,57 @@
 import { describe, it, expect } from 'vitest';
-import { MoveTree } from '../../lib/MoveTree';
+import { moveTreeFromPgn } from '../../lib/moveTreeFromPgn';
+import { parsePgn } from '../../lib/pgnParser';
 import { moveTreeToReactFlow } from './moveTreeToReactFlow';
 
-// Simple tree: 1. e4 e5 2. Nf3 Nc6
-const simpleModel = {
-    fen: 'start',
-    move: null,
-    children: [
-        {
-            fen: 'fen1', move: { notation: 'e4', moveNumber: 1, turn: 'w' }, children: [
-                {
-                    fen: 'fen2', move: { notation: 'e5', moveNumber: null, turn: 'b' }, children: [
-                        {
-                            fen: 'fen3', move: { notation: 'Nf3', moveNumber: 2, turn: 'w' }, children: [
-                                { fen: 'fen4', move: { notation: 'Nc6', moveNumber: null, turn: 'b' }, children: [] }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        }
-    ]
-};
+const simplePgn = `
+[Event "Simple"]
+[Site "Test"]
+[Date "2023.01.01"]
+[White "White"]
+[Black "Black"]
+[Result "*"]
 
-// Tree with variation: 1. e4 e5 2. Nf3 (2. f4 exf4) 2... Nc6
-const variationModel = {
-    fen: 'start',
-    move: null,
-    children: [
-        {
-            fen: 'fen1', move: { notation: 'e4', moveNumber: 1, turn: 'w' }, children: [
-                {
-                    fen: 'fen2', move: { notation: 'e5', moveNumber: null, turn: 'b' }, children: [
-                        // Mainline: Nf3
-                        {
-                            fen: 'fen3', move: { notation: 'Nf3', moveNumber: 2, turn: 'w' }, children: [
-                                { fen: 'fen4', move: { notation: 'Nc6', moveNumber: null, turn: 'b' }, children: [] }
-                            ]
-                        },
-                        // Variation: f4 exf4 (as a sibling at this ply)
-                        {
-                            fen: 'fen5', move: { notation: 'f4', moveNumber: 2, turn: 'w' }, children: [
-                                { fen: 'fen6', move: { notation: 'exf4', moveNumber: null, turn: 'b' }, children: [] }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        }
-    ]
-};
+1. e4 e5 2. Nf3 Nc6 *
+`;
+
+const variationPgn = `
+[Event "Variation"]
+[Site "Test"]
+[Date "2023.01.01"]
+[White "White"]
+[Black "Black"]
+[Result "*"]
+
+1. e4 e5 2. Nf3 (2. f4 exf4) 2... Nc6 *
+`;
 
 describe('moveTreeToReactFlow', () => {
     it('converts a simple MoveTree to React Flow nodes and edges', () => {
-        const tree = new MoveTree(simpleModel);
+        const parsed = parsePgn(simplePgn)!;
+        const tree = moveTreeFromPgn(parsed);
         const { nodes, edges } = moveTreeToReactFlow(tree);
         // There should be 4 nodes (e4, e5, Nf3, Nc6)
         expect(nodes.length).toBe(4);
         // There should be 3 edges (one for each move from parent)
         expect(edges.length).toBe(3);
-        // Node ids should match tree node ids (excluding root)
-        const nodeIds = nodes.map(n => n.id);
-        expect(nodeIds).toContain(tree.root.children[0].id);
-        expect(nodeIds).toContain(tree.root.children[0].children[0].id);
-        expect(nodeIds).toContain(tree.root.children[0].children[0].children[0].id);
-        expect(nodeIds).toContain(tree.root.children[0].children[0].children[0].children[0].id);
-        // Edge sources/targets should match parent/child ids
+        // Node notations should match expected
+        const notations = nodes.map(n => n.data.notation);
+        expect(notations).toContain('e4');
+        expect(notations).toContain('e5');
+        expect(notations).toContain('Nf3');
+        expect(notations).toContain('Nc6');
+        // All nodes and edges should have branchGroup (mainline = 0)
+        for (const node of nodes) {
+            expect(node.data.branchGroup).toBe(0);
+        }
         for (const edge of edges) {
-            expect(nodeIds).toContain(edge.source);
-            expect(nodeIds).toContain(edge.target);
+            expect(edge.data.branchGroup).toBe(0);
         }
     });
 
     it('converts a MoveTree with a variation to correct nodes and edges', () => {
-        const tree = new MoveTree(variationModel);
+        const parsed = parsePgn(variationPgn)!;
+        const tree = moveTreeFromPgn(parsed);
         const { nodes, edges } = moveTreeToReactFlow(tree);
         // There should be 6 nodes: e4, e5, Nf3, Nc6, f4, exf4 (root omitted)
         expect(nodes.length).toBe(6);
@@ -85,15 +63,27 @@ describe('moveTreeToReactFlow', () => {
         expect(notations).toContain('f4');
         expect(notations).toContain('exf4');
         expect(notations).toContain('Nc6');
-        // Check that edges connect correct parent/child
+        // Mainline nodes/edges should have branchGroup 0, variation nodes/edges should have >0
+        const mainlineNodes = nodes.filter(n => n.data.notation === 'Nf3' || n.data.notation === 'Nc6');
+        for (const node of mainlineNodes) {
+            expect(node.data.branchGroup).toBe(0);
+        }
+        const variationNodes = nodes.filter(n => n.data.notation === 'f4' || n.data.notation === 'exf4');
+        for (const node of variationNodes) {
+            expect(node.data.branchGroup).toBeGreaterThan(0);
+        }
         for (const edge of edges) {
-            expect(nodes.map(n => n.id)).toContain(edge.source);
-            expect(nodes.map(n => n.id)).toContain(edge.target);
+            if (variationNodes.map(n => n.id).includes(edge.target)) {
+                expect(edge.data.branchGroup).toBeGreaterThan(0);
+            } else {
+                expect(edge.data.branchGroup).toBe(0);
+            }
         }
     });
 
     it('skips the root node (move: null) in the output nodes', () => {
-        const tree = new MoveTree(simpleModel);
+        const parsed = parsePgn(simplePgn)!;
+        const tree = moveTreeFromPgn(parsed);
         const { nodes } = moveTreeToReactFlow(tree);
         // The root node's id should not be present in the output nodes
         const nodeIds = nodes.map(n => n.id);

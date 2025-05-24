@@ -22,23 +22,19 @@ export function moveTreeToReactFlow(moveTree: any): { nodes: any[]; edges: any[]
     const Y_SPACING = 90;
 
     // Recursive layout: returns [nextY, centerY] for this node
-    // variationGroup: 0 for mainline, unique for each variation branch
     function traverse(
         node: any,
         parentId: string | null = null,
         depth: number = 0,
         variationIndex: number = 0,
-        y: number = 0,
-        variationGroup: number | string = 0
+        y: number = 0
     ): [number, number] {
         let myY: number = y;
         let childYs: number[] = [];
         let nextY: number = y;
         for (let i = 0; i < node.children.length; i++) {
             const child = node.children[i];
-            // For mainline, keep parent's variationGroup; for variations, use their own index
-            const childVariationGroup = (i === 0) ? variationGroup : child.id || `${parentId}-var${i}`;
-            const [newNextY, childCenterY]: [number, number] = traverse(child, node.id, depth + 1, i, nextY, childVariationGroup);
+            const [newNextY, childCenterY]: [number, number] = traverse(child, node.id, depth + 1, i, nextY);
             childYs.push(childCenterY);
             nextY = newNextY;
         }
@@ -57,6 +53,7 @@ export function moveTreeToReactFlow(moveTree: any): { nodes: any[]; edges: any[]
                 annotations: node.move?.annotations,
                 nag: node.move?.nag,
                 turn: node.move?.turn,
+                branchGroup: node.branchGroup,
             },
             type: 'default',
         });
@@ -65,7 +62,7 @@ export function moveTreeToReactFlow(moveTree: any): { nodes: any[]; edges: any[]
                 id: `${parentId}-${id}`,
                 source: parentId,
                 target: id,
-                data: { variationIndex, variationGroup },
+                data: { branchGroup: node.branchGroup },
             });
         }
         return [nextY === y ? y + 1 : nextY, myY];
@@ -77,8 +74,7 @@ export function moveTreeToReactFlow(moveTree: any): { nodes: any[]; edges: any[]
         parentId: string | null = null,
         depth: number = 0,
         variationIndex: number = 0,
-        y: number = 0,
-        variationGroup: number | string = 0
+        y: number = 0
     ): [number, number] {
         // If this is the root node (no move), don't add it, but traverse its children
         if (!node.move) {
@@ -86,14 +82,13 @@ export function moveTreeToReactFlow(moveTree: any): { nodes: any[]; edges: any[]
             let childYs: number[] = [];
             for (let i = 0; i < node.children.length; i++) {
                 const child = node.children[i];
-                const childVariationGroup = (i === 0) ? variationGroup : child.id || `root-var${i}`;
-                const [newNextY, childCenterY]: [number, number] = traverseWithHiddenRoot(child, null, 0, i, nextY, childVariationGroup);
+                const [newNextY, childCenterY]: [number, number] = traverseWithHiddenRoot(child, null, 0, i, nextY);
                 childYs.push(childCenterY);
                 nextY = newNextY;
             }
             return [nextY === y ? y + 1 : nextY, childYs.length > 0 ? childYs.reduce((a, b) => a + b, 0) / childYs.length : y];
         } else {
-            return traverse(node, parentId, depth, variationIndex, y, variationGroup);
+            return traverse(node, parentId, depth, variationIndex, y);
         }
     }
 

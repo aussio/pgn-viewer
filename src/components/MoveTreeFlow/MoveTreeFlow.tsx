@@ -129,7 +129,7 @@ const variationColors = [
  *   id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, data - React Flow edge props.
  */
 const ChessEdge: FC<EdgeProps> = ({ id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, data }) => {
-  const group = data?.variationGroup ?? 0;
+  const group = data?.branchGroup ?? 0;
   const style = group === 0
     ? { stroke: '#111', strokeWidth: 3 }
     : { stroke: variationColors[(Math.abs(hashCode(group.toString()))) % variationColors.length], strokeWidth: 3 };
@@ -180,7 +180,10 @@ const MoveTreeFlow: FC<MoveTreeFlowProps> = ({ moveTree }) => {
         edges={edges}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
+        // Show all nodes centered in the view to start
         fitView
+        // Padding around centered view to start.
+        fitViewOptions={{ padding: .25 }}
         style={{ width: '100%', height: '100%' }}
       >
         <Controls className={styles['react-flow__controls']} />

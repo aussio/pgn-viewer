@@ -37,32 +37,9 @@ This document outlines the steps to build a structured, interactive, and navigab
 
 ---
 
-## 2. Variation Detection & Chapterization (Vertical Slice)
+## 3. Navigation & Presentation (with tests and UI)
 
-### 2.1. Define Chapterization Rules
-- [ ] Establish criteria for significant variations:
-  - Length-based (e.g., >5 moves)
-  - Annotation-based (presence of commentary/NAGs)
-  - Depth-based (nested variations)
-- [ ] **Write tests** for chapterization rule logic (unit tests for rule application on sample trees).
-- [ ] **Implement a UI** to allow configuration/visualization of chapterization rules and preview which branches will become chapters.
-
-### 2.2. Implement Chapterization Algorithm
-- [ ] Write a recursive function to traverse the move tree and identify:
-  - Main line (Chapter 1)
-  - Significant branches (subsequent chapters/sub-chapters)
-- [ ] Store metadata for each chapter:
-  - Title
-  - Move range
-  - Summary
-- [ ] **Write tests** for chapterization output (unit and integration tests for correct chapter assignment and metadata).
-- [ ] **Implement a UI** to display the chapter structure (e.g., sidebar/table of contents with chapters and sub-chapters).
-
----
-
-## 3. Interactive Presentation & Navigation (Vertical Slice)
-
-### 3.1. Layout & Navigation
+### 3.0. Layout & Navigation
 - [ ] Design a book-like UI:
   - Left sidebar/table of contents for chapters
   - Main content area for moves, annotations, and diagrams
@@ -70,12 +47,17 @@ This document outlines the steps to build a structured, interactive, and navigab
 - [ ] **Write tests** for navigation logic (unit/integration tests for navigation state, breadcrumbs, and chapter selection).
 - [ ] **Implement UI** for sidebar, main content, and breadcrumbs.
 
-### 3.2. Interactive Chessboard
-- [ ] Integrate a chessboard library (e.g., Chessboard.js, Chessground, or react-chessboard)
-- [ ] Enable clicking moves in notation to update the board
-- [ ] Auto-highlight annotated moves
-- [ ] **Write tests** for board state updates and move highlighting (unit/integration tests).
-- [ ] **Implement UI** for interactive chessboard and move list.
+### 3.1. Implement Chapterization Algorithm
+- [ ] Write a recursive function to traverse the move tree and identify:
+  - Main line (Chapter 1)
+  - Significant branches (subsequent chapters/sub-chapters)
+  - For an initial pass, make a chapter per branch.
+- [ ] Store metadata for each chapter:
+  - Title
+  - Move range
+  - Summary
+- [ ] **Write tests** for chapterization output (unit and integration tests for correct chapter assignment and metadata).
+- [ ] **Implement a UI** to display the chapter structure (e.g., sidebar/table of contents with chapters and sub-chapters).
 
 ### 3.3. Branch Navigation
 - [ ] Embed hyperlinks at branching points for alternative variations
@@ -83,13 +65,20 @@ This document outlines the steps to build a structured, interactive, and navigab
 - [ ] **Write tests** for branch navigation logic (unit/integration tests for correct linking and navigation).
 - [ ] **Implement UI** for branch navigation (links/buttons at variation points).
 
-### 3.4. Board Visualization
+### 3.4. Interactive Chessboard
+- [ ] Integrate a chessboard library (e.g., Chessboard.js, Chessground, or react-chessboard)
+- [ ] Enable clicking moves in notation to update the board
+- [ ] Auto-highlight annotated moves
+- [ ] **Write tests** for board state updates and move highlighting (unit/integration tests).
+- [ ] **Implement UI** for interactive chessboard and move list.
+
+### 3.5. Board Visualization
 - [ ] Dynamically generate board diagrams at key positions (annotations/critical moves)
 - [ ] Implement caching for generated diagrams
 - [ ] **Write tests** for diagram generation and caching logic.
 - [ ] **Implement UI** for displaying diagrams inline with annotations.
 
-### 3.5. (Optional) Branch Overview Visualization
+### 3.6. (Optional) Branch Overview Visualization
 - [ ] Create an interactive tree/mind-map of branches
 - [ ] Enable navigation by clicking nodes in the overview
 - [ ] **Write tests** for overview map logic and navigation.
@@ -105,16 +94,23 @@ This document outlines the steps to build a structured, interactive, and navigab
 
 ## 5. Milestones (Vertical Slices)
 1. **PGN Parsing & Move Tree (with tests and UI)**
-2. **Chapterization Logic (with tests and UI)**
-3. **Navigation & Presentation (with tests and UI)**
-4. **Interactive Chessboard & Branching (with tests and UI)**
-5. **Advanced Features (Branch Map, Caching, etc., with tests and UI)**
+2. **Navigation & Presentation (with tests and UI)**
+3. **Interactive Chessboard & Branching (with tests and UI)**
+4. **Advanced Features (Branch Map, Caching, etc., with tests and UI)**
 
 ---
 ## 6. Cool additional ideas
 - Significance Algorithm
 - [ ] Use the lichess API (https://explorer.lichess.ovh/lichess?variant=standard) to send a FEN and get back the most common next moves.
 - [ ] Gifs of the lines moving (with whatever the print-supported placeholder would be)
+
+### 6.1. Define Chapterization Rules
+- [ ] Establish criteria for significant variations:
+  - Length-based (e.g., >5 moves)
+  - Annotation-based (presence of commentary/NAGs)
+  - Depth-based (nested variations)
+- [ ] **Write tests** for chapterization rule logic (unit tests for rule application on sample trees).
+- [ ] **Implement a UI** to allow configuration/visualization of chapterization rules and preview which branches will become chapters.
 
 # Out of Scope
 - Multi-game PGN files: Only single-game PGN files are supported. The application will not handle or display multiple games from a single PGN file.

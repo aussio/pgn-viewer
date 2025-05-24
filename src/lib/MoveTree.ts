@@ -10,6 +10,7 @@ export type _MoveTreeNodeModel = {
     move: any;
     children: _MoveTreeNodeModel[];
     id?: string;
+    branchGroup?: number;
 };
 
 /**
@@ -22,6 +23,7 @@ class MoveTreeNode {
     parent: MoveTreeNode | null;
     isRoot: boolean;
     children: MoveTreeNode[];
+    branchGroup: number;
 
     constructor(model: _MoveTreeNodeModel, parent: MoveTreeNode | null = null, isRoot: boolean = false) {
         // Chess-specific fields
@@ -30,6 +32,7 @@ class MoveTreeNode {
         this.id = (model.id == null) ? generateMoveTreeNodeId() : model.id;
         this.parent = parent;
         this.isRoot = isRoot;
+        this.branchGroup = model.branchGroup ?? 0;
         // Children (variations or next moves)
         this.children = (model.children || []).map((child: any) => new MoveTreeNode(child, this));
     }
