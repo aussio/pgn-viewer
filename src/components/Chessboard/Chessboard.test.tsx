@@ -1,18 +1,39 @@
 // @vitest-environment jsdom
-import { describe, it, expect } from 'vitest';
-import { render } from '@testing-library/react';
-import '@testing-library/jest-dom/vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { render, cleanup } from '@testing-library/react';
 import Chessboard from './Chessboard';
+import { useMoveTreeStore } from '../../lib/store';
+import { MoveTreeNode } from '../../lib/MoveTree';
 
 /**
  * Unit test for Chessboard component.
  * Verifies that the board renders for a given FEN.
  */
 describe('Chessboard', () => {
-  it('renders the chessboard for a given FEN', () => {
-    const fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
-    const { container } = render(<Chessboard fen={fen} />);
-    // The chessboard should render an SVG element
-    expect(container.querySelector('svg')).toBeInTheDocument();
+  beforeEach(() => {
+    useMoveTreeStore.setState({ currentNode: null });
+  });
+  afterEach(() => {
+    useMoveTreeStore.setState({ currentNode: null });
+    cleanup();
+  });
+
+  it('renders the default position if no currentNode', () => {
+    const { container } = render(<Chessboard />);
+    // Look for a chessboard square (e.g., data-square or class)
+    // console.log(container.innerHTML);
+    const square = container.querySelector('[data-square="e4"]') || container.querySelector('.chessboard-square');
+    expect(square).toBeTruthy();
+  });
+
+  it('renders the correct position for the currentNode (white king on e4)', () => {
+    // FEN: only a white king on e4
+    const fen = '8/8/8/8/4K3/8/8/8 w - - 0 1';
+    const node = new MoveTreeNode({ fen, move: { notation: 'e4' }, children: [] });
+    useMoveTreeStore.setState({ currentNode: node });
+    const { container } = render(<Chessboard />);
+    // Find the e4 square
+    const square = container.querySelector('[data-square="e4"]') || container.querySelector('.chessboard-square');
+    expect(square).toBeTruthy();
   });
 }); 

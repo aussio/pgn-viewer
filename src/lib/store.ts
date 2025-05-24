@@ -26,6 +26,19 @@ interface MoveTreeStore {
   setCurrentNode: (node: MoveTreeNode | null) => void;
   setParsed: (parsed: ParseTree | null) => void;
   getCurrentBranchGroup: () => number;
+  getBranchGroupChapters: () => Map<number, MoveTreeNode>;
+}
+
+// Utility to get the first node for each branch group in a move tree
+export function getBranchGroupChaptersFromTree(moveTree: MoveTree | null): Map<number, MoveTreeNode> {
+  const map = new Map<number, MoveTreeNode>();
+  if (!moveTree) return map;
+  moveTree.root.walk(node => {
+    if (!map.has(node.branchGroup)) {
+      map.set(node.branchGroup, node);
+    }
+  });
+  return map;
 }
 
 export const useMoveTreeStore = create<MoveTreeStore>((set, get) => ({
@@ -36,4 +49,5 @@ export const useMoveTreeStore = create<MoveTreeStore>((set, get) => ({
   setCurrentNode: (currentNode) => set({ currentNode }),
   setParsed: (parsed) => set({ parsed }),
   getCurrentBranchGroup: () => get().currentNode?.branchGroup ?? 0,
+  getBranchGroupChapters: () => getBranchGroupChaptersFromTree(get().moveTree),
 })); 
