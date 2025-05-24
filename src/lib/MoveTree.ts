@@ -77,6 +77,21 @@ class MoveTreeNode {
         });
         return found;
     }
+
+    /**
+     * Recursively find a node by id in the move tree.
+     * @param node The root node to search from
+     * @param nodeId The id to search for
+     * @returns The found node or null
+     */
+    static findById(node: MoveTreeNode, nodeId: string): MoveTreeNode | null {
+        if (node.id === nodeId) return node;
+        for (const child of node.children) {
+            const found = MoveTreeNode.findById(child, nodeId);
+            if (found) return found;
+        }
+        return null;
+    }
 }
 
 let moveTreeNodeId = 0;

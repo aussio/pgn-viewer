@@ -3,7 +3,7 @@ import React from 'react';
 import { ReactFlow, Controls, getSmoothStepPath, Handle, Position, Edge, Node } from '@xyflow/react';
 import { moveTreeToReactFlow } from './moveTreeToReactFlow';
 import styles from './MoveTreeFlow.module.css';
-import type { EdgeProps } from '@xyflow/react';
+import type { EdgeProps, Node as FlowNode, NodeMouseHandler } from '@xyflow/react';
 import type { MoveTree } from '../../lib/MoveTree';
 
 /**
@@ -14,6 +14,7 @@ import type { MoveTree } from '../../lib/MoveTree';
  * Props:
  *   moveTree: MoveTree - The move tree data structure to visualize (from lib/MoveTree).
  *   selectedNodeId?: string - The ID of the selected node.
+ *   onNodeSelect?: (nodeId: string) => void - Optional function to call when a node is clicked.
  *
  * Usage:
  *   <MoveTreeFlow moveTree={moveTree} />
@@ -21,6 +22,7 @@ import type { MoveTree } from '../../lib/MoveTree';
 interface MoveTreeFlowProps {
   moveTree: MoveTree;
   selectedNodeId?: string;
+  onNodeSelect?: (nodeId: string) => void;
 }
 
 // Map piece notation to SVG filenames
@@ -166,7 +168,7 @@ function hashCode(str: string): number {
 
 const edgeTypes = { chessEdge: ChessEdge };
 
-const MoveTreeFlow: FC<MoveTreeFlowProps> = ({ moveTree, selectedNodeId }) => {
+const MoveTreeFlow: FC<MoveTreeFlowProps> = ({ moveTree, selectedNodeId, onNodeSelect }) => {
   if (!moveTree) return <div>No move tree to display.</div>;
   // Patch moveTreeToReactFlow to use 'chessMove' as node type and style edges
   const { nodes, edges } = moveTreeToReactFlow(moveTree);
@@ -181,6 +183,11 @@ const MoveTreeFlow: FC<MoveTreeFlowProps> = ({ moveTree, selectedNodeId }) => {
     n.id === selectedNodeId ? { ...n, selected: true } : { ...n, selected: false }
   );
 
+  // Handle node click
+  const handleNodeClick = React.useCallback<NonNullable<NodeMouseHandler>>((event, node) => {
+    if (onNodeSelect) onNodeSelect(node.id);
+  }, [onNodeSelect]);
+
   return (
     <div className={styles.container}>
       <ReactFlow
@@ -191,6 +198,7 @@ const MoveTreeFlow: FC<MoveTreeFlowProps> = ({ moveTree, selectedNodeId }) => {
         fitView
         fitViewOptions={{ padding: .25 }}
         style={{ width: '100%', height: '100%' }}
+        onNodeClick={handleNodeClick}
       >
         <Controls className={styles['react-flow__controls']} />
       </ReactFlow>

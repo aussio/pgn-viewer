@@ -8,7 +8,7 @@ import BookLayout from '../components/Layout/BookLayout'
 import Sidebar from '../components/Layout/Sidebar'
 import Breadcrumbs from '../components/Layout/Breadcrumbs'
 import Chessboard from '../components/Chessboard/Chessboard'
-import type { MoveTree, MoveTreeNode } from '../lib/MoveTree'
+import { MoveTree, MoveTreeNode } from '../lib/MoveTree'
 import styles from './HomePage.module.css'
 
 /**
@@ -72,6 +72,17 @@ const HomePage: FC = () => {
     };
   }, [moveTree, currentNode]);
 
+  function handleNodeSelect(
+    nodeId: string,
+    moveTree: MoveTree | null,
+    setCurrentNode: (node: MoveTreeNode) => void
+  ): void {
+    if (!moveTree) return;
+    const newNode = MoveTreeNode.findById(moveTree.root, nodeId);
+    if (!newNode) return;
+    setCurrentNode(newNode);
+  }
+
   return (
     <BookLayout sidebar={<Sidebar />} breadcrumbs={<Breadcrumbs />}>
       <h1>PGN Viewer</h1>
@@ -88,7 +99,11 @@ const HomePage: FC = () => {
         <button onClick={goNext} disabled={!currentNode || currentNode.children.length === 0}>Next</button>
       </div>
       <div className={styles.moveTreeSection}>
-        {moveTree && <MoveTreeVisualization moveTree={moveTree} selectedNodeId={currentNode?.id} />}
+        {moveTree && <MoveTreeVisualization
+          moveTree={moveTree}
+          selectedNodeId={currentNode?.id}
+          onNodeSelect={nodeId => handleNodeSelect(nodeId, moveTree, setCurrentNode)}
+        />}
       </div>
     </BookLayout>
   )

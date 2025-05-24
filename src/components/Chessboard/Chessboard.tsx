@@ -14,6 +14,7 @@ const Chessboard: React.FC<{ fen: string }> = ({ fen }) => {
       position={fen}
       arePiecesDraggable={false} // For now, disable piece dragging
       boardWidth={400}
+      animationDuration={300}
     />
   );
 };

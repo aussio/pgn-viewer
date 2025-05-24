@@ -132,4 +132,25 @@ describe('MoveTree and MoveTreeNode (chess-specific)', () => {
         const result = node.first(n => n.move && n.move.notation === 'zzz');
         expect(result).toBeNull();
     });
+});
+
+describe('MoveTreeNode.findById', () => {
+    it('finds a node by id in the tree', () => {
+        const model = {
+            fen: 'start',
+            move: null,
+            children: [
+                { fen: 'fen1', move: { notation: 'e4' }, children: [] },
+                { fen: 'fen2', move: { notation: 'd4' }, children: [
+                    { fen: 'fen3', move: { notation: 'd5' }, children: [] }
+                ] }
+            ]
+        };
+        const tree = new MoveTree(model);
+        const node1 = tree.root.children[0];
+        const node3 = tree.root.children[1].children[0];
+        expect(MoveTreeNode.findById(tree.root, node1.id)).toBe(node1);
+        expect(MoveTreeNode.findById(tree.root, node3.id)).toBe(node3);
+        expect(MoveTreeNode.findById(tree.root, 'not-an-id')).toBeNull();
+    });
 }); 
