@@ -13,12 +13,14 @@ import type { MoveTree } from '../../lib/MoveTree';
  *
  * Props:
  *   moveTree: MoveTree - The move tree data structure to visualize (from lib/MoveTree).
+ *   selectedNodeId?: string - The ID of the selected node.
  *
  * Usage:
  *   <MoveTreeFlow moveTree={moveTree} />
  */
 interface MoveTreeFlowProps {
   moveTree: MoveTree;
+  selectedNodeId?: string;
 }
 
 // Map piece notation to SVG filenames
@@ -59,8 +61,9 @@ function getToSquare(notation: string | null): string {
  *
  * Props:
  *   data: { notation, turn, ... } - Node data from moveTreeToReactFlow.
+ *   selected?: boolean - Indicates if the node is selected.
  */
-const ChessMoveNode: FC<{ data: any }> = ({ data }) => {
+const ChessMoveNode: FC<{ data: any; selected?: boolean }> = ({ data, selected }) => {
   const { notation, turn } = data;
   const piece = getPieceType(notation);
   const color = turn === 'w' ? 'w' : 'b';
@@ -80,7 +83,7 @@ const ChessMoveNode: FC<{ data: any }> = ({ data }) => {
   }, []);
   const svgSrc = svgs[`${color}${piece}`];
   return (
-    <div className={styles.chessMoveNode}>
+    <div className={selected ? `${styles.chessMoveNode} ${styles['chessMoveNode--selected']}` : styles.chessMoveNode}>
       {/* Target handle for incoming edges (invisible, non-interactive) */}
       <Handle type="target" position={Position.Left} style={{ opacity: 0, pointerEvents: 'none' }} isConnectable={false} />
       {svgSrc && <img src={svgSrc} alt={piece} className={styles.chessMoveNode__piece} />}
@@ -163,7 +166,7 @@ function hashCode(str: string): number {
 
 const edgeTypes = { chessEdge: ChessEdge };
 
-const MoveTreeFlow: FC<MoveTreeFlowProps> = ({ moveTree }) => {
+const MoveTreeFlow: FC<MoveTreeFlowProps> = ({ moveTree, selectedNodeId }) => {
   if (!moveTree) return <div>No move tree to display.</div>;
   // Patch moveTreeToReactFlow to use 'chessMove' as node type and style edges
   const { nodes, edges } = moveTreeToReactFlow(moveTree);
@@ -173,16 +176,19 @@ const MoveTreeFlow: FC<MoveTreeFlowProps> = ({ moveTree }) => {
     e.label = labelEdge(e);
   });
 
+  // Use React Flow's selection mechanism
+  const nodesWithSelection = nodes.map(n =>
+    n.id === selectedNodeId ? { ...n, selected: true } : { ...n, selected: false }
+  );
+
   return (
     <div className={styles.container}>
       <ReactFlow
-        nodes={nodes}
+        nodes={nodesWithSelection}
         edges={edges}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
-        // Show all nodes centered in the view to start
         fitView
-        // Padding around centered view to start.
         fitViewOptions={{ padding: .25 }}
         style={{ width: '100%', height: '100%' }}
       >

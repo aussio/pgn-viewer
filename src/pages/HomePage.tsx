@@ -89,7 +89,7 @@ const HomePage: FC = () => {
           <button onClick={goNext} disabled={!currentNode || currentNode.children.length === 0}>Next</button>
         </div>
         <div className={styles.moveTreeSection}>
-          {moveTree && <MoveTreeVisualization moveTree={moveTree} />}
+          {moveTree && <MoveTreeVisualization moveTree={moveTree} selectedNodeId={currentNode?.id} />}
         </div>
       </div>
     </BookLayout>

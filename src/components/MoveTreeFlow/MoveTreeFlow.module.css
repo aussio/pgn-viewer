@@ -19,6 +19,7 @@
   justify-content: center;
   box-shadow: 0 2px 8px #0002;
   position: relative;
+  outline: 4px solid transparent;
 }
 
 .chessMoveNode__piece {
@@ -31,6 +32,12 @@
   font-size: 14px;
   font-weight: 600;
   color: #1976d2;
+}
+
+.chessMoveNode--selected {
+  border: 2px solid #1976d2;
+  outline: 10px solid #1976d233;
+  z-index: 2;
 }
 
 /* Custom styles for React Flow controls */

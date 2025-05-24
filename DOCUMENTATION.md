@@ -132,8 +132,18 @@ This document describes the structure of the parsed PGN result as returned by th
 - Moves are in the `moves` array, each with a `notation` object and other move details.
 
 ## Project Type Rules
-- Always prefer custom types defined in `src/types` (such as `ParseTree`, `PgnMove`, etc.) over types from third-party libraries. All code should use these custom types for consistency and accuracy, unless there is a strong, documented reason to do otherwise.
-- `PgnMove` in `src/types` is the correct and canonical move type for this project. The `moveNumber` property is often `null` for black's moves, as this is how the parser typically returns the data.
+Always prefer custom types defined in `src/types` (such as `ParseTree`, `PgnMove`, etc.) over types from third-party libraries. All code should use these custom types for consistency and accuracy, unless there is a strong, documented reason to do otherwise.
+`PgnMove` in `src/types` is the correct and canonical move type for this project. The `moveNumber` property is often `null` for black's moves, as this is how the parser typically returns the data.
+
+## Chessboard, Move Tree, and Graph Synchronization
+
+The HomePage component manages the current move node (`currentNode`) as the user steps through the game. This state is used to keep the chessboard and the move tree graph in sync:
+
+- The current FEN (`currentNode.fen`) is passed to the `Chessboard` component to display the correct board position.
+- The current node's id (`currentNode.id`) is passed as `selectedNodeId` to the move tree graph (`MoveTreeFlow` via `MoveTreeVisualization`), which highlights the corresponding node in the graph.
+- As the user steps forward or backward through the moves (using buttons or keyboard), `currentNode` is updated, and both the chessboard and the graph update automatically to reflect the new position and selection.
+
+This ensures that the board view and the move tree visualization always represent the same point in the game, providing a synchronized and intuitive user experience.
 
 ## Assistant Cursor Rules
 
