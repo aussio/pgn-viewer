@@ -23,7 +23,7 @@ interface MoveTreeStore {
   currentNode: MoveTreeNode | null;
   parsed: ParseTree | null;
   setMoveTree: (moveTree: MoveTree | null) => void;
-  setCurrentNode: (node: MoveTreeNode | null) => void;
+  setCurrentNode: (currentNode: MoveTreeNode | null) => void;
   setParsed: (parsed: ParseTree | null) => void;
   getCurrentBranchGroup: () => number;
   getBranchGroupChapters: () => Map<number, MoveTreeNode>;
