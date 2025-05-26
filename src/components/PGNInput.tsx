@@ -1,7 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { parsePgn } from '../lib/pgnParser'
 import styles from '../App.module.css'
-import type { ParseTree } from '../types/pgn'
 import { useMoveTreeStore } from '../lib/store'
 
 const defaultPgn = `[Event "Braunfel Scotch: Main line opening"]
@@ -23,19 +22,9 @@ const defaultPgn = `[Event "Braunfel Scotch: Main line opening"]
  * PGNInput
  *
  * A component for entering, parsing, and debugging PGN input.
- *
- * Props:
- *   setParsed: function - Setter for parsed PGN data (lifts parsed state to parent).
- *   parsed: ParseTree | null - The parsed PGN data (used for debug display).
  */
-type PGNInputProps = {
-  setParsed: (parsed: ParseTree | null) => void;
-  parsed: ParseTree | null;
-};
-
 function PGNInput() {
   const setParsed = useMoveTreeStore(state => state.setParsed)
-  const parsed = useMoveTreeStore(state => state.parsed)
   const [pgn, setPgn] = useState<string>(defaultPgn)
   const [error, setError] = useState<string | null>(null)
 
@@ -58,6 +47,11 @@ function PGNInput() {
       setError('Failed to parse PGN.')
     }
   }
+
+  useEffect(() => {
+    handleParse();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>

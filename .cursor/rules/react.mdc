@@ -1,0 +1,6 @@
+---
+description: 
+globs: *.jsx,*.tsx
+alwaysApply: false
+---
+* Never use inline style= for CSS. Always extract CSS into a separate CSS modules file.

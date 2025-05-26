@@ -1,15 +1,32 @@
 // @vitest-environment jsdom
 import React from 'react';
-import { render, screen, within, cleanup } from '@testing-library/react';
+import { render, screen, within, cleanup, fireEvent } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import Sidebar from './Sidebar';
 import { useMoveTreeStore } from '../../lib/store';
 import { MoveTree } from '../../lib/MoveTree';
 
+jest.mock('../../lib/store');
+
 describe('Sidebar', () => {
+  const mockSetCurrentNode = jest.fn();
+  const mockCurrentNode = { id: '2', branchGroup: 1 };
+  const mockChaptersMap = new Map([
+    [0, { id: '1', branchGroup: 0, move: { notation: 'e4' } }],
+    [1, { id: '2', branchGroup: 1, move: { notation: 'd4' } }],
+  ]);
+
   beforeEach(() => {
-    useMoveTreeStore.setState({ moveTree: null });
+    jest.clearAllMocks();
+    (useMoveTreeStore as unknown as jest.Mock).mockImplementation(fn => {
+      if (fn.toString().includes('getBranchGroupChapters')) return () => mockChaptersMap;
+      if (fn.toString().includes('currentNode')) return mockCurrentNode;
+      if (fn.toString().includes('setCurrentNode')) return mockSetCurrentNode;
+      return undefined;
+    });
   });
+
   afterEach(() => {
     useMoveTreeStore.setState({ moveTree: null });
     cleanup();
@@ -51,5 +68,19 @@ describe('Sidebar', () => {
     const sidebar = screen.getByTestId('sidebar');
     expect(within(sidebar).getByText(/Main Line: e4/)).toBeTruthy();
     expect(within(sidebar).queryByText(/Variation/)).toBeNull();
+  });
+
+  it('renders chapters and bolds the current branch', () => {
+    const { getByText } = render(<Sidebar />);
+    expect(getByText('Main Line: e4')).toBeInTheDocument();
+    expect(getByText('Variation 1: d4').tagName).toBe('STRONG');
+  });
+
+  it('calls setCurrentNode when a branch is clicked', () => {
+    const { getByTestId } = render(<Sidebar />);
+    fireEvent.click(getByTestId('sidebar-branch-0'));
+    expect(mockSetCurrentNode).toHaveBeenCalledWith(mockChaptersMap.get(0));
+    fireEvent.click(getByTestId('sidebar-branch-1'));
+    expect(mockSetCurrentNode).toHaveBeenCalledWith(mockChaptersMap.get(1));
   });
 }); 

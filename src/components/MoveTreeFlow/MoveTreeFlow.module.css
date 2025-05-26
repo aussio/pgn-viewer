@@ -22,6 +22,10 @@
   outline: 4px solid transparent;
 }
 
+.chessMoveNode:hover {
+  cursor: pointer;
+}
+
 .chessMoveNode__piece {
   width: 28px;
   height: 28px;

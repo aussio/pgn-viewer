@@ -1,16 +1,14 @@
-import React, { useState } from 'react'
+import React from 'react'
 import type { FC } from 'react'
-import PGNInput from '../components/PGNInput'
-import MoveTreeVisualization from '../components/MoveTreeVisualization'
-import { moveTreeFromPgn } from '../lib/moveTreeFromPgn'
-import type { ParseTree } from '../types/pgn'
 import BookLayout from '../components/Layout/BookLayout'
 import Sidebar from '../components/Layout/Sidebar'
 import Breadcrumbs from '../components/Layout/Breadcrumbs'
 import Chessboard from '../components/Chessboard/Chessboard'
-import { MoveTree, MoveTreeNode } from '../lib/MoveTree'
-import styles from './HomePage.module.css'
 import { useMoveTreeStore } from '../lib/store'
+import PGNInput from '../components/PGNInput'
+import MoveTreeVisualization from '../components/MoveTreeVisualization'
+import { moveTreeFromPgn } from '../lib/moveTreeFromPgn'
+import styles from './HomePage.module.css'
 
 /**
  * HomePage
@@ -20,7 +18,6 @@ import { useMoveTreeStore } from '../lib/store'
  */
 const HomePage: FC = () => {
   const parsed = useMoveTreeStore(state => state.parsed)
-  const setParsed = useMoveTreeStore(state => state.setParsed)
   const moveTree = useMoveTreeStore(state => state.moveTree)
   const setMoveTree = useMoveTreeStore(state => state.setMoveTree)
   const currentNode = useMoveTreeStore(state => state.currentNode)

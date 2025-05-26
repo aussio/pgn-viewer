@@ -1,6 +1,0 @@
----
-description: 
-globs: *.jsx,*.tsx
-alwaysApply: false
----
-* CSS should never be within the react javascript files. It should always be within CSS modules.
