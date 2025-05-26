@@ -1,6 +1,5 @@
 import React from 'react';
 import { useMoveTreeStore } from '../../lib/store';
-import type { MoveTreeNode } from '../../lib/MoveTree';
 import styles from './Sidebar.module.css';
 
 /**
@@ -33,10 +32,14 @@ const Sidebar: React.FC = () => {
     const node = chaptersMap.get(branchGroup);
     if (!node) return null;
     const children = parentToChildren.get(branchGroup) || [];
+    const handleClick = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      setCurrentNode(node);
+    };
     return (
       <li
         key={node.id}
-        onClick={() => setCurrentNode(node)}
+        onClick={handleClick}
         className={isMainLine ? `${styles.chapterItem} ${styles.mainChapterItem}` : styles.chapterItem}
         data-testid={`sidebar-branch-${branchGroup}`}
       >
@@ -62,7 +65,7 @@ const Sidebar: React.FC = () => {
 
   // Find all top-level branches (those whose parent is not a branch head)
   const topLevelBranchGroups = Array.from(chaptersMap.entries())
-    .filter(([branchGroup, node]) => {
+    .filter(([, node]) => {
       const parentBranchGroup = node.parent && node.parent.branchGroup !== undefined ? node.parent.branchGroup : null;
       return parentBranchGroup === null || !chaptersMap.has(parentBranchGroup);
     })

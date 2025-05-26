@@ -1,0 +1,10 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Test Files for React Components
+* All test files for React components must specify the jsdom environment using the // @vitest-environment jsdom directive at the top of the file. This ensures DOM APIs are available for component tests.
+* All test files for React components must call cleanup() in afterEach to ensure the DOM is reset between tests. This prevents test pollution and ensures reliable, isolated tests.
+* All test files for React components must import { describe, it, expect, beforeEach, afterEach } from 'vitest' at the top of the file.
+* All non-React test files must specify the node environment using // @vitest-environment node and import { describe, it, expect } from 'vitest' at the top of the file.

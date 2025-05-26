@@ -1,3 +1,4 @@
+import React from 'react';
 import MoveTreeFlow from './MoveTreeFlow/MoveTreeFlow'
 import type { FC } from 'react';
 import { MoveTree, MoveTreeNode } from '../lib/MoveTree';

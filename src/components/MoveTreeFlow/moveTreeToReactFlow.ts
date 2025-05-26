@@ -16,8 +16,6 @@
 export function moveTreeToReactFlow(moveTree: any): { nodes: any[]; edges: any[] } {
     const nodes: any[] = [];
     const edges: any[] = [];
-    const NODE_WIDTH = 80;
-    const NODE_HEIGHT = 80;
     const X_SPACING = 180;
     const Y_SPACING = 90;
 
@@ -26,7 +24,6 @@ export function moveTreeToReactFlow(moveTree: any): { nodes: any[]; edges: any[]
         node: any,
         parentId: string | null = null,
         depth: number = 0,
-        variationIndex: number = 0,
         y: number = 0
     ): [number, number] {
         let myY: number = y;
@@ -34,7 +31,7 @@ export function moveTreeToReactFlow(moveTree: any): { nodes: any[]; edges: any[]
         let nextY: number = y;
         for (let i = 0; i < node.children.length; i++) {
             const child = node.children[i];
-            const [newNextY, childCenterY]: [number, number] = traverse(child, node.id, depth + 1, i, nextY);
+            const [newNextY, childCenterY]: [number, number] = traverse(child, node.id, depth + 1, nextY);
             childYs.push(childCenterY);
             nextY = newNextY;
         }
@@ -73,7 +70,6 @@ export function moveTreeToReactFlow(moveTree: any): { nodes: any[]; edges: any[]
         node: any,
         parentId: string | null = null,
         depth: number = 0,
-        variationIndex: number = 0,
         y: number = 0
     ): [number, number] {
         // If this is the root node (no move), don't add it, but traverse its children
@@ -82,13 +78,13 @@ export function moveTreeToReactFlow(moveTree: any): { nodes: any[]; edges: any[]
             let childYs: number[] = [];
             for (let i = 0; i < node.children.length; i++) {
                 const child = node.children[i];
-                const [newNextY, childCenterY]: [number, number] = traverseWithHiddenRoot(child, null, 0, i, nextY);
+                const [newNextY, childCenterY]: [number, number] = traverseWithHiddenRoot(child, null, 0, nextY);
                 childYs.push(childCenterY);
                 nextY = newNextY;
             }
             return [nextY === y ? y + 1 : nextY, childYs.length > 0 ? childYs.reduce((a, b) => a + b, 0) / childYs.length : y];
         } else {
-            return traverse(node, parentId, depth, variationIndex, y);
+            return traverse(node, parentId, depth, y);
         }
     }
 

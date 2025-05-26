@@ -1,6 +1,6 @@
 ---
 description: 
-globs: *.test.tsx,*.test.jsx
+globs: *.test.tsx,*.test.jsx,*.test.js,*.test.ts
 alwaysApply: false
 ---
 # Test Files for React Components

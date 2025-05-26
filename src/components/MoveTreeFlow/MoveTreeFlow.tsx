@@ -1,9 +1,9 @@
-import type { FC } from 'react';
 import React from 'react';
-import { ReactFlow, Controls, getSmoothStepPath, Handle, Position, Edge, Node } from '@xyflow/react';
+import type { FC } from 'react';
+import { ReactFlow, Controls, getSmoothStepPath, Handle, Position, Edge } from '@xyflow/react';
 import { moveTreeToReactFlow } from './moveTreeToReactFlow';
 import styles from './MoveTreeFlow.module.css';
-import type { EdgeProps, Node as FlowNode, NodeMouseHandler } from '@xyflow/react';
+import type { EdgeProps } from '@xyflow/react';
 import type { MoveTree } from '../../lib/MoveTree';
 
 /**
@@ -14,7 +14,7 @@ import type { MoveTree } from '../../lib/MoveTree';
  * Props:
  *   moveTree: MoveTree - The move tree data structure to visualize (from lib/MoveTree).
  *   selectedNodeId?: string - The ID of the selected node.
- *   onNodeSelect?: (nodeId: string) => void - Optional function to call when a node is clicked.
+ *   onNodeSelect?: (id: string) => void - Optional function to call when a node is clicked.
  *
  * Usage:
  *   <MoveTreeFlow moveTree={moveTree} />
@@ -22,7 +22,7 @@ import type { MoveTree } from '../../lib/MoveTree';
 interface MoveTreeFlowProps {
   moveTree: MoveTree;
   selectedNodeId?: string;
-  onNodeSelect?: (nodeId: string) => void;
+  onNodeSelect?: (id: string) => void;
 }
 
 // Map piece notation to SVG filenames
@@ -184,7 +184,7 @@ const MoveTreeFlow: FC<MoveTreeFlowProps> = ({ moveTree, selectedNodeId, onNodeS
   );
 
   // Handle node click
-  const handleNodeClick = React.useCallback<NonNullable<NodeMouseHandler>>((event, node) => {
+  const handleNodeClick = React.useCallback((event: React.MouseEvent, node: any) => {
     if (onNodeSelect) onNodeSelect(node.id);
   }, [onNodeSelect]);
 

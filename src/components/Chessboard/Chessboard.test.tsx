@@ -1,3 +1,4 @@
+import React from 'react';
 // @vitest-environment jsdom
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { render, cleanup } from '@testing-library/react';
@@ -20,8 +21,6 @@ describe('Chessboard', () => {
 
   it('renders the default position if no currentNode', () => {
     const { container } = render(<Chessboard />);
-    // Look for a chessboard square (e.g., data-square or class)
-    // console.log(container.innerHTML);
     const square = container.querySelector('[data-square="e4"]') || container.querySelector('.chessboard-square');
     expect(square).toBeTruthy();
   });

@@ -1,3 +1,4 @@
+import React from 'react'
 import { useState, useEffect } from 'react'
 import { parsePgn } from '../lib/pgnParser'
 import styles from '../App.module.css'

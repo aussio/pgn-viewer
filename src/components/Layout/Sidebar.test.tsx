@@ -1,16 +1,15 @@
-// @vitest-environment jsdom
 import React from 'react';
+// @vitest-environment jsdom
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, within, cleanup, fireEvent } from '@testing-library/react';
-import '@testing-library/jest-dom';
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import Sidebar from './Sidebar';
 import { useMoveTreeStore } from '../../lib/store';
 import { MoveTree } from '../../lib/MoveTree';
 
-jest.mock('../../lib/store');
+vi.mock('../../lib/store');
 
 describe('Sidebar', () => {
-  const mockSetCurrentNode = jest.fn();
+  const mockSetCurrentNode = vi.fn();
   const mockCurrentNode = { id: '2', branchGroup: 1 };
   const mockChaptersMap = new Map([
     [0, { id: '1', branchGroup: 0, move: { notation: 'e4' } }],
@@ -18,10 +17,10 @@ describe('Sidebar', () => {
   ]);
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    (useMoveTreeStore as unknown as jest.Mock).mockImplementation(fn => {
-      if (fn.toString().includes('getBranchGroupChapters')) return () => mockChaptersMap;
-      if (fn.toString().includes('currentNode')) return mockCurrentNode;
+    vi.clearAllMocks();
+    (useMoveTreeStore as unknown as { mockImplementation: Function }).mockImplementation((fn: any) => {
+      if (fn.toString().includes('getBranchGroupChapters')) return () => new Map();
+      if (fn.toString().includes('currentNode')) return null;
       if (fn.toString().includes('setCurrentNode')) return mockSetCurrentNode;
       return undefined;
     });
@@ -47,6 +46,12 @@ describe('Sidebar', () => {
         { fen: 'fen2', move: { notation: 'd4' }, children: [] },
       ],
     });
+    (useMoveTreeStore as unknown as { mockImplementation: Function }).mockImplementation((fn: any) => {
+      if (fn.toString().includes('getBranchGroupChapters')) return () => mockChaptersMap;
+      if (fn.toString().includes('currentNode')) return mockCurrentNode;
+      if (fn.toString().includes('setCurrentNode')) return mockSetCurrentNode;
+      return undefined;
+    });
     useMoveTreeStore.setState({ moveTree: tree });
     render(<Sidebar />);
     const sidebar = screen.getByTestId('sidebar');
@@ -63,6 +68,12 @@ describe('Sidebar', () => {
         { fen: 'fen1', move: { notation: 'e4' }, children: [] },
       ],
     });
+    (useMoveTreeStore as unknown as { mockImplementation: Function }).mockImplementation((fn: any) => {
+      if (fn.toString().includes('getBranchGroupChapters')) return () => new Map([[0, { id: '1', branchGroup: 0, move: { notation: 'e4' } }]]);
+      if (fn.toString().includes('currentNode')) return { id: '1', branchGroup: 0, move: { notation: 'e4' } };
+      if (fn.toString().includes('setCurrentNode')) return mockSetCurrentNode;
+      return undefined;
+    });
     useMoveTreeStore.setState({ moveTree: tree });
     render(<Sidebar />);
     const sidebar = screen.getByTestId('sidebar');
@@ -71,12 +82,24 @@ describe('Sidebar', () => {
   });
 
   it('renders chapters and bolds the current branch', () => {
+    (useMoveTreeStore as unknown as { mockImplementation: Function }).mockImplementation((fn: any) => {
+      if (fn.toString().includes('getBranchGroupChapters')) return () => mockChaptersMap;
+      if (fn.toString().includes('currentNode')) return mockCurrentNode;
+      if (fn.toString().includes('setCurrentNode')) return mockSetCurrentNode;
+      return undefined;
+    });
     const { getByText } = render(<Sidebar />);
     expect(getByText('Main Line: e4')).toBeInTheDocument();
     expect(getByText('Variation 1: d4').tagName).toBe('STRONG');
   });
 
   it('calls setCurrentNode when a branch is clicked', () => {
+    (useMoveTreeStore as unknown as { mockImplementation: Function }).mockImplementation((fn: any) => {
+      if (fn.toString().includes('getBranchGroupChapters')) return () => mockChaptersMap;
+      if (fn.toString().includes('currentNode')) return mockCurrentNode;
+      if (fn.toString().includes('setCurrentNode')) return mockSetCurrentNode;
+      return undefined;
+    });
     const { getByTestId } = render(<Sidebar />);
     fireEvent.click(getByTestId('sidebar-branch-0'));
     expect(mockSetCurrentNode).toHaveBeenCalledWith(mockChaptersMap.get(0));

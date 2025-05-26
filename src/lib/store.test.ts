@@ -26,7 +26,6 @@ describe('useMoveTreeStore', () => {
     const node = new MoveTreeNode({ fen: 'f', move: { notation: 'a' }, children: [], branchGroup: 2 });
     useMoveTreeStore.getState().setCurrentNode(node);
     expect(useMoveTreeStore.getState().currentNode).toBe(node);
-    console.log(useMoveTreeStore.getState());
     expect(useMoveTreeStore.getState().getCurrentBranchGroup()).toBe(2);
   });
 
