@@ -60,14 +60,14 @@ This document outlines the steps to build a structured, interactive, and navigab
 - [ ] **Implement a UI** to display the chapter structure (e.g., sidebar/table of contents with chapters and sub-chapters).
 
 ### 3.3. Branch Navigation
-- [ ] Embed hyperlinks at branching points for alternative variations
-- [ ] Ensure clear parent/child navigation between branches
-- [ ] **Write tests** for branch navigation logic (unit/integration tests for correct linking and navigation).
-- [ ] **Implement UI** for branch navigation (links/buttons at variation points).
+- [x] Embed hyperlinks at branching points for alternative variations
+- [x] Ensure clear parent/child navigation between branches
+- [x] **Write tests** for branch navigation logic (unit/integration tests for correct linking and navigation).
+- [x] **Implement UI** for branch navigation (links/buttons at variation points).
 
 ### 3.4. Interactive Chessboard
-- [ ] Integrate a chessboard library (e.g., Chessboard.js, Chessground, or react-chessboard)
-- [ ] Enable clicking moves in notation to update the board
+- [x] Integrate a chessboard library (e.g., Chessboard.js, Chessground, or react-chessboard)
+- [x] Enable clicking moves in notation to update the board
 - [ ] Auto-highlight annotated moves
 - [ ] **Write tests** for board state updates and move highlighting (unit/integration tests).
 - [ ] **Implement UI** for interactive chessboard and move list.
@@ -79,10 +79,10 @@ This document outlines the steps to build a structured, interactive, and navigab
 - [ ] **Implement UI** for displaying diagrams inline with annotations.
 
 ### 3.6. (Optional) Branch Overview Visualization
-- [ ] Create an interactive tree/mind-map of branches
-- [ ] Enable navigation by clicking nodes in the overview
-- [ ] **Write tests** for overview map logic and navigation.
-- [ ] **Implement UI** for the overview map.
+- [x] Create an interactive tree/mind-map of branches
+- [x] Enable navigation by clicking nodes in the overview
+- [x] **Write tests** for overview map logic and navigation.
+- [x] **Implement UI** for the overview map.
 
 ---
 
@@ -99,6 +99,23 @@ This document outlines the steps to build a structured, interactive, and navigab
 4. **Advanced Features (Branch Map, Caching, etc., with tests and UI)**
 
 ---
+
+## 7. MoveTree Editing & Interactive Board
+
+### 7.1. Enable Editing of MoveTree via Chessboard
+
+- [ ] Allow users to play moves directly on the chessboard UI.
+- [ ] When a move is played:
+  - If the move already exists as a child of the current node, update `currentNode` to that child (no tree modification).
+  - If the move does not exist and the current node is the end of its branch, add the move as a new child (continuing the current variation).
+  - If the move does not exist and the current node is not at the end of its branch, create a new variation/branch starting from the current node with the new move.
+- [ ] Update the MoveTree and Zustand store accordingly.
+- [ ] Ensure the UI (chessboard, move list, tree view) updates in response to edits.
+- [ ] (Optional) Add ability to delete nodes/moves from the tree.
+- [ ] **Write tests** for all editing scenarios (add, branch, delete).
+
+---
+
 ## 6. Cool additional ideas
 - Significance Algorithm
 - [ ] Use the lichess API (https://explorer.lichess.ovh/lichess?variant=standard) to send a FEN and get back the most common next moves.

@@ -132,6 +132,47 @@ describe('MoveTree and MoveTreeNode (chess-specific)', () => {
         const result = node.first(n => n.move && n.move.notation === 'zzz');
         expect(result).toBeNull();
     });
+
+    it('findChildByMove returns the correct child or null', () => {
+        const root = new MoveTreeNode({ fen: 'start', move: null, children: [] });
+        const e4 = root.addChild({ fen: 'fen1', move: { notation: 'e4', turn: 'w' }, children: [] });
+        const d4 = root.addChild({ fen: 'fen2', move: { notation: 'd4', turn: 'w' }, children: [] });
+        expect(root.findChildByMove({ notation: 'e4', turn: 'w' })).toBe(e4);
+        expect(root.findChildByMove({ notation: 'd4', turn: 'w' })).toBe(d4);
+        expect(root.findChildByMove({ notation: 'c4', turn: 'w' })).toBeNull();
+        // Should match even if turn is omitted
+        expect(root.findChildByMove({ notation: 'e4' })).toBe(e4);
+    });
+
+    it('isAtEndOfBranch returns true for leaf, false for non-leaf', () => {
+        const root = new MoveTreeNode({ fen: 'start', move: null, children: [] });
+        expect(root.isAtEndOfBranch()).toBe(true);
+        root.addChild({ fen: 'fen1', move: { notation: 'e4' }, children: [] });
+        expect(root.isAtEndOfBranch()).toBe(false);
+    });
+
+    it('addMove adds a child node with correct fields', () => {
+        const root = new MoveTreeNode({ fen: 'start', move: null, children: [] });
+        const move = { notation: 'e4', moveNumber: 1, turn: 'w' };
+        const fen = 'fen1';
+        const child = root.addMove(move, fen);
+        expect(child.move).toEqual(move);
+        expect(child.fen).toBe(fen);
+        expect(child.parent).toBe(root);
+        expect(child.branchGroup).toBe(root.branchGroup);
+        // Custom branchGroup
+        const move2 = { notation: 'd4', moveNumber: 1, turn: 'w' };
+        const child2 = root.addMove(move2, 'fen2', 42);
+        expect(child2.branchGroup).toBe(42);
+    });
+
+    it('deleteNode removes the node from its parent', () => {
+        const root = new MoveTreeNode({ fen: 'start', move: null, children: [] });
+        const child = root.addChild({ fen: 'fen1', move: { notation: 'e4' }, children: [] });
+        expect(root.children.length).toBe(1);
+        child.deleteNode();
+        expect(root.children.length).toBe(0);
+    });
 });
 
 describe('MoveTreeNode.findById', () => {

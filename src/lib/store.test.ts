@@ -55,4 +55,50 @@ describe('useMoveTreeStore', () => {
     useMoveTreeStore.getState().setCurrentNode(null);
     expect(useMoveTreeStore.getState().getCurrentBranchGroup()).toBe(0);
   });
+});
+
+describe('playOrAddMove', () => {
+  beforeEach(() => {
+    useMoveTreeStore.setState({ moveTree: null, currentNode: null });
+  });
+
+  it('does nothing if moveTree or currentNode is null', () => {
+    useMoveTreeStore.getState().playOrAddMove({ notation: 'e4', moveNumber: 1, turn: 'w' }, 'fen1');
+    expect(useMoveTreeStore.getState().currentNode).toBeNull();
+    const tree = new MoveTree({ fen: 'start', move: null, children: [] });
+    useMoveTreeStore.setState({ moveTree: tree, currentNode: null });
+    useMoveTreeStore.getState().playOrAddMove({ notation: 'e4', moveNumber: 1, turn: 'w' }, 'fen1');
+    expect(useMoveTreeStore.getState().currentNode).toBeNull();
+  });
+
+  it('adds a move as a continuation if at end of branch', () => {
+    const tree = new MoveTree({ fen: 'start', move: null, children: [] });
+    useMoveTreeStore.setState({ moveTree: tree, currentNode: tree.root });
+    useMoveTreeStore.getState().playOrAddMove({ notation: 'e4', moveNumber: 1, turn: 'w' }, 'fen1');
+    const node = useMoveTreeStore.getState().currentNode;
+    expect(node).not.toBeNull();
+    expect(node?.move.notation).toBe('e4');
+    expect(tree.root.children[0]).toBe(node);
+  });
+
+  it('moves to an existing child if the move already exists', () => {
+    const tree = new MoveTree({ fen: 'start', move: null, children: [] });
+    const child = tree.root.addMove({ notation: 'e4', moveNumber: 1, turn: 'w' }, 'fen1');
+    useMoveTreeStore.setState({ moveTree: tree, currentNode: tree.root });
+    useMoveTreeStore.getState().playOrAddMove({ notation: 'e4', moveNumber: 1, turn: 'w' }, 'fen1');
+    expect(useMoveTreeStore.getState().currentNode).toBe(child);
+  });
+
+  it('adds a move as a new branch if not at end of branch', () => {
+    const tree = new MoveTree({ fen: 'start', move: null, children: [] });
+    const child = tree.root.addMove({ notation: 'e4', moveNumber: 1, turn: 'w' }, 'fen1');
+    useMoveTreeStore.setState({ moveTree: tree, currentNode: tree.root });
+    // Add a new move that is not a child
+    useMoveTreeStore.getState().playOrAddMove({ notation: 'd4', moveNumber: 1, turn: 'w' }, 'fen2');
+    const newNode = useMoveTreeStore.getState().currentNode;
+    expect(newNode).not.toBeNull();
+    expect(newNode?.move.notation).toBe('d4');
+    expect(newNode?.branchGroup).not.toBe(child.branchGroup);
+    expect(tree.root.children.length).toBe(2);
+  });
 }); 

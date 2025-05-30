@@ -92,6 +92,53 @@ class MoveTreeNode {
         }
         return null;
     }
+
+    /**
+     * Find a direct child node matching the given move (by notation and turn).
+     * @param move The move object to match (should have notation and turn)
+     * @returns The child node if found, else null
+     */
+    findChildByMove(move: { notation: string; turn?: string }): MoveTreeNode | null {
+        return this.children.find(child =>
+            child.move &&
+            child.move.notation === move.notation &&
+            (move.turn === undefined || child.move.turn === move.turn)
+        ) || null;
+    }
+
+    /**
+     * Returns true if this node is at the end of its branch (no children).
+     */
+    isAtEndOfBranch(): boolean {
+        return this.children.length === 0;
+    }
+
+    /**
+     * Add a move as a child node. If branchGroup is provided, use it; otherwise inherit from this node.
+     * @param move The move object (should have notation, moveNumber, etc.)
+     * @param fen The resulting FEN after the move
+     * @param branchGroup Optional branch group for variations
+     * @returns The new child node
+     */
+    addMove(move: any, fen: string, branchGroup?: number): MoveTreeNode {
+        const childModel = {
+            fen,
+            move,
+            children: [],
+            branchGroup: branchGroup ?? this.branchGroup,
+        };
+        return this.addChild(childModel);
+    }
+
+    /**
+     * (Stub) Delete this node from its parent. For future use.
+     */
+    deleteNode(): void {
+        if (!this.parent) return;
+        const idx = this.parent.children.indexOf(this);
+        if (idx !== -1) this.parent.children.splice(idx, 1);
+        // Optionally: clean up references, etc.
+    }
 }
 
 let moveTreeNodeId = 0;

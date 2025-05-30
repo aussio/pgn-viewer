@@ -10,6 +10,7 @@
  *   - setMoveTree
  *   - setCurrentNode
  *   - setParsed
+ *   - playOrAddMove
  *
  * Selectors:
  *   - currentBranchGroup: branchGroup of the current node (or 0)
@@ -27,6 +28,7 @@ interface MoveTreeStore {
   setParsed: (parsed: ParseTree | null) => void;
   getCurrentBranchGroup: () => number;
   getBranchGroupChapters: () => Map<number, MoveTreeNode>;
+  playOrAddMove: (move: any, fen: string) => void;
 }
 
 // Utility to get the first node for each branch group in a move tree
@@ -50,4 +52,38 @@ export const useMoveTreeStore = create<MoveTreeStore>((set, get) => ({
   setParsed: (parsed) => set({ parsed }),
   getCurrentBranchGroup: () => get().currentNode?.branchGroup ?? 0,
   getBranchGroupChapters: () => getBranchGroupChaptersFromTree(get().moveTree),
+
+  /**
+   * Play or add a move to the MoveTree from the currentNode.
+   * - If the move exists as a child, updates currentNode to that child.
+   * - If not, adds the move as a continuation (if at end) or as a new branch (if not at end).
+   * - Updates moveTree and currentNode in the store.
+   * @param move The move object (should have notation, moveNumber, turn, etc.)
+   * @param fen The resulting FEN after the move
+   */
+  playOrAddMove: (move: any, fen: string) => {
+    const { moveTree, currentNode } = get();
+    if (!moveTree || !currentNode) return;
+    // 1. Check if move exists as a child
+    const existing = currentNode.findChildByMove(move);
+    if (existing) {
+      set({ currentNode: existing });
+      return;
+    }
+    // 2. If at end, add as continuation
+    if (currentNode.isAtEndOfBranch()) {
+      const newNode = currentNode.addMove(move, fen);
+      set({ currentNode: newNode });
+      return;
+    }
+    // 3. Otherwise, add as new branch (variation)
+    // Find max branchGroup in the tree
+    let maxBranchGroup = 0;
+    moveTree.root.walk(node => {
+      if (node.branchGroup > maxBranchGroup) maxBranchGroup = node.branchGroup;
+    });
+    const newBranchGroup = maxBranchGroup + 1;
+    const newNode = currentNode.addMove(move, fen, newBranchGroup);
+    set({ currentNode: newNode });
+  },
 })); 
