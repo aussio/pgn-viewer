@@ -152,6 +152,10 @@ class MoveTreeNode {
         const idx = parent.children.indexOf(this);
         if (idx === -1) return;
         parent.children.splice(idx, 1);
+        // If this was the first child and there is a new first child, promote its branch group
+        if (idx === 0 && parent.children.length > 0) {
+            parent.children[0].setMainLineBranchGroup(parent.branchGroup);
+        }
     }
 }
 

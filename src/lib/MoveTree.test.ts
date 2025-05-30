@@ -237,6 +237,23 @@ describe('MoveTree and MoveTreeNode (chess-specific)', () => {
         // Nc6 should be gone
         expect(e5.children.find(n => n.move.notation === 'Nc6')).toBeUndefined();
     });
+
+    it('promotes new first child to parent branch group when deleting main line node', () => {
+        // root (branchGroup=0)
+        //   ├─ e4 (main, branchGroup=0)
+        //   └─ d4 (variation, branchGroup=1)
+        const root = new MoveTreeNode({ fen: 'start', move: null, children: [] });
+        const e4 = root.addChild({ fen: 'fen1', move: { notation: 'e4', moveNumber: 1 }, children: [] });
+        e4.branchGroup = 0;
+        const d4 = root.addChild({ fen: 'fen2', move: { notation: 'd4', moveNumber: 1 }, children: [] });
+        d4.branchGroup = 1;
+        // Delete e4 (main line)
+        e4.deleteSubtree();
+        // d4 should now be the first child and have branchGroup 0 (promoted)
+        expect(root.children.length).toBe(1);
+        expect(root.children[0]).toBe(d4);
+        expect(d4.branchGroup).toBe(0);
+    });
 });
 
 describe('MoveTreeNode.findById', () => {
