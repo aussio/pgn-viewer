@@ -170,8 +170,72 @@ describe('MoveTree and MoveTreeNode (chess-specific)', () => {
         const root = new MoveTreeNode({ fen: 'start', move: null, children: [] });
         const child = root.addChild({ fen: 'fen1', move: { notation: 'e4' }, children: [] });
         expect(root.children.length).toBe(1);
-        child.deleteNode();
+        child.deleteSubtree();
         expect(root.children.length).toBe(0);
+    });
+
+    it('deleteSubtree: deleting main line node before a branch removes only that node and its descendants', () => {
+        // root -> e4 (main) -> e5 (main) -> Nf3 (main, to be deleted)
+        //                                      ↳ Nc6 (variation, branchGroup=1)
+        //                                          ↳ Bb5 (main)
+        //                                          ↳ a6 (variation, branchGroup=2)
+        const root = new MoveTreeNode({ fen: 'start', move: null, children: [] });
+        const e4 = root.addChild({ fen: 'fen1', move: { notation: 'e4', moveNumber: 1 }, children: [] });
+        const e5 = e4.addChild({ fen: 'fen2', move: { notation: 'e5', moveNumber: 1 }, children: [] });
+        const Nf3 = e5.addChild({ fen: 'fen3', move: { notation: 'Nf3', moveNumber: 2 }, children: [] });
+        const Nc6 = e5.addChild({ fen: 'fen4', move: { notation: 'Nc6', moveNumber: 2 }, children: [] });
+        Nc6.branchGroup = 1;
+        const Bb5 = Nc6.addChild({ fen: 'fen5', move: { notation: 'Bb5', moveNumber: 3 }, children: [] });
+        const a6 = Nc6.addChild({ fen: 'fen6', move: { notation: 'a6', moveNumber: 3 }, children: [] });
+        a6.branchGroup = 2;
+        // Delete Nf3 (main line)
+        Nf3.deleteSubtree();
+        // e5 should have only one child: Nc6 (variation)
+        expect(e5.children.length).toBe(1);
+        expect(e5.children[0].move.notation).toBe('Nc6');
+        // Nc6's children: Bb5 (main), a6 (variation)
+        expect(e5.children[0].children.length).toBe(2);
+        expect(e5.children[0].children[0].move.notation).toBe('Bb5');
+        expect(e5.children[0].children[1].move.notation).toBe('a6');
+    });
+
+    it('deleteSubtree: deleting last main line node of a sub-branch removes only that node and its descendants', () => {
+        // root -> e4 (main) -> e5 (main)
+        //                          ↳ Nc6 (variation, branchGroup=1)
+        //                              ↳ Bb5 (main, to be deleted)
+        //                              ↳ a6 (variation, branchGroup=2)
+        const root = new MoveTreeNode({ fen: 'start', move: null, children: [] });
+        const e4 = root.addChild({ fen: 'fen1', move: { notation: 'e4', moveNumber: 1 }, children: [] });
+        const e5 = e4.addChild({ fen: 'fen2', move: { notation: 'e5', moveNumber: 1 }, children: [] });
+        const Nc6 = e5.addChild({ fen: 'fen3', move: { notation: 'Nc6', moveNumber: 2 }, children: [] });
+        Nc6.branchGroup = 1;
+        const Bb5 = Nc6.addChild({ fen: 'fen4', move: { notation: 'Bb5', moveNumber: 3 }, children: [] });
+        const a6 = Nc6.addChild({ fen: 'fen5', move: { notation: 'a6', moveNumber: 3 }, children: [] });
+        a6.branchGroup = 2;
+        // Delete Bb5 (main line of branchGroup=1)
+        Bb5.deleteSubtree();
+        // Nc6 should have only one child: a6 (variation)
+        expect(Nc6.children.length).toBe(1);
+        expect(Nc6.children[0].move.notation).toBe('a6');
+    });
+
+    it('deleteSubtree: deleting a variation removes only that variation and its subtree', () => {
+        // root -> e4 (main) -> e5 (main)
+        //                          ├─ Nf3 (main)
+        //                          └─ Nc6 (variation, branchGroup=1)
+        const root = new MoveTreeNode({ fen: 'start', move: null, children: [] });
+        const e4 = root.addChild({ fen: 'fen1', move: { notation: 'e4', moveNumber: 1 }, children: [] });
+        const e5 = e4.addChild({ fen: 'fen2', move: { notation: 'e5', moveNumber: 1 }, children: [] });
+        const Nf3 = e5.addChild({ fen: 'fen3', move: { notation: 'Nf3', moveNumber: 2 }, children: [] });
+        const Nc6 = e5.addChild({ fen: 'fen4', move: { notation: 'Nc6', moveNumber: 2 }, children: [] });
+        Nc6.branchGroup = 1;
+        // Delete Nc6 (variation)
+        Nc6.deleteSubtree();
+        // e5 should have only one child: Nf3 (main)
+        expect(e5.children.length).toBe(1);
+        expect(e5.children[0].move.notation).toBe('Nf3');
+        // Nc6 should be gone
+        expect(e5.children.find(n => n.move.notation === 'Nc6')).toBeUndefined();
     });
 });
 

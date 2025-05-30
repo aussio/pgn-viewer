@@ -11,12 +11,14 @@
  *   - setCurrentNode
  *   - setParsed
  *   - playOrAddMove
+ *   - deleteNodeAndDescendants
  *
  * Selectors:
  *   - currentBranchGroup: branchGroup of the current node (or 0)
  */
 import { create } from 'zustand';
 import type { MoveTree, MoveTreeNode } from './MoveTree';
+import { MoveTreeNode as MoveTreeNodeClass } from './MoveTree';
 import type { ParseTree } from '../types/pgn';
 
 interface MoveTreeStore {
@@ -29,6 +31,7 @@ interface MoveTreeStore {
   getCurrentBranchGroup: () => number;
   getBranchGroupChapters: () => Map<number, MoveTreeNode>;
   playOrAddMove: (move: any, fen: string) => void;
+  deleteNodeAndDescendants: (nodeId: string) => void;
 }
 
 // Utility to get the first node for each branch group in a move tree
@@ -85,5 +88,26 @@ export const useMoveTreeStore = create<MoveTreeStore>((set, get) => ({
     const newBranchGroup = maxBranchGroup + 1;
     const newNode = currentNode.addMove(move, fen, newBranchGroup);
     set({ currentNode: newNode });
+  },
+
+  /**
+   * Delete a node and all its descendants from the MoveTree by nodeId.
+   * If the currentNode is deleted, set currentNode to its parent or root.
+   * Does nothing if node is not found or is the root.
+   * @param nodeId The id of the node to delete
+   */
+  deleteNodeAndDescendants: (nodeId: string) => {
+    const { moveTree, currentNode } = get();
+    if (!moveTree) return;
+    const node = MoveTreeNodeClass.findById(moveTree.root, nodeId);
+    if (!node || !node.parent) return; // Don't delete root or non-existent
+    const parent = node.parent;
+    node.deleteSubtree();
+    // If currentNode was deleted, move to parent or root
+    if (currentNode && (currentNode === node || node.all((n: MoveTreeNode) => n === currentNode).length > 0)) {
+      set({ currentNode: parent || moveTree.root });
+    } else {
+      set({ moveTree });
+    }
   },
 })); 

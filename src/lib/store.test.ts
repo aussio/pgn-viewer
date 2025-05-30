@@ -101,4 +101,36 @@ describe('playOrAddMove', () => {
     expect(newNode?.branchGroup).not.toBe(child.branchGroup);
     expect(tree.root.children.length).toBe(2);
   });
+});
+
+describe('deleteNodeAndDescendants', () => {
+  beforeEach(() => {
+    useMoveTreeStore.setState({ moveTree: null, currentNode: null });
+  });
+
+  it('removes the node and all its descendants from the tree and updates currentNode if needed', () => {
+    const tree = new MoveTree({ fen: 'start', move: null, children: [] });
+    const e4 = tree.root.addMove({ notation: 'e4', moveNumber: 1, turn: 'w' }, 'fen1');
+    const d4 = tree.root.addMove({ notation: 'd4', moveNumber: 1, turn: 'w' }, 'fen2');
+    const d5 = d4.addMove({ notation: 'd5', moveNumber: 1, turn: 'b' }, 'fen3');
+    useMoveTreeStore.setState({ moveTree: tree, currentNode: d5 });
+    // Delete d4 (should remove d4 and d5)
+    useMoveTreeStore.getState().deleteNodeAndDescendants(d4.id);
+    // Only e4 should remain
+    expect(tree.root.children.length).toBe(1);
+    expect(tree.root.children[0]).toBe(e4);
+    // d4 and d5 should be unreachable
+    expect(tree.root.all(n => n === d4 || n === d5)).toEqual([]);
+    // currentNode should be root since d5 was deleted
+    expect(useMoveTreeStore.getState().currentNode).toBe(tree.root);
+  });
+
+  it('does nothing if node is root or not found', () => {
+    const tree = new MoveTree({ fen: 'start', move: null, children: [] });
+    useMoveTreeStore.setState({ moveTree: tree, currentNode: tree.root });
+    useMoveTreeStore.getState().deleteNodeAndDescendants(tree.root.id); // Should not delete root
+    expect(useMoveTreeStore.getState().moveTree).toBe(tree);
+    useMoveTreeStore.getState().deleteNodeAndDescendants('not-an-id'); // Should do nothing
+    expect(useMoveTreeStore.getState().moveTree).toBe(tree);
+  });
 }); 

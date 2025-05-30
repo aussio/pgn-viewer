@@ -131,13 +131,27 @@ class MoveTreeNode {
     }
 
     /**
-     * (Stub) Delete this node from its parent. For future use.
+     * Helper: Recursively set branchGroup for this node and its main line (first child at each level).
+     * @param branchGroup The branchGroup to set (0 for main line, or parent's branchGroup for sub-branches)
      */
-    deleteNode(): void {
-        if (!this.parent) return;
-        const idx = this.parent.children.indexOf(this);
-        if (idx !== -1) this.parent.children.splice(idx, 1);
-        // Optionally: clean up references, etc.
+    setMainLineBranchGroup(branchGroup: number): void {
+        this.branchGroup = branchGroup;
+        if (this.children.length > 0) {
+            // Only update the first child (main line) recursively
+            this.children[0].setMainLineBranchGroup(branchGroup);
+        }
+    }
+
+    /**
+     * Recursively delete this node and all its descendants from the tree.
+     * Removes this node from its parent's children array. Does nothing if called on the root.
+     */
+    deleteSubtree(): void {
+        if (!this.parent) return; // Don't delete root
+        const parent = this.parent;
+        const idx = parent.children.indexOf(this);
+        if (idx === -1) return;
+        parent.children.splice(idx, 1);
     }
 }
 

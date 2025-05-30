@@ -5,6 +5,7 @@ import { moveTreeToReactFlow } from './moveTreeToReactFlow';
 import styles from './MoveTreeFlow.module.css';
 import type { EdgeProps } from '@xyflow/react';
 import type { MoveTree } from '../../lib/MoveTree';
+import { useMoveTreeStore } from '../../lib/store';
 
 /**
  * MoveTreeFlow
@@ -169,6 +170,11 @@ function hashCode(str: string): number {
 const edgeTypes = { chessEdge: ChessEdge };
 
 const MoveTreeFlow: FC<MoveTreeFlowProps> = ({ moveTree, selectedNodeId, onNodeSelect }) => {
+  const deleteNodeAndDescendants = useMoveTreeStore(state => state.deleteNodeAndDescendants);
+  const rootId = moveTree.root.id;
+  const [nodeToDelete, setNodeToDelete] = React.useState<string | null>(null);
+  const [showModal, setShowModal] = React.useState(false);
+
   if (!moveTree) return <div>No move tree to display.</div>;
   // Patch moveTreeToReactFlow to use 'chessMove' as node type and style edges
   const { nodes, edges } = moveTreeToReactFlow(moveTree);
@@ -188,6 +194,28 @@ const MoveTreeFlow: FC<MoveTreeFlowProps> = ({ moveTree, selectedNodeId, onNodeS
     if (onNodeSelect) onNodeSelect(node.id);
   }, [onNodeSelect]);
 
+  // Handle right-click (context menu) on node
+  const handleNodeContextMenu = React.useCallback((event: React.MouseEvent, node: any) => {
+    event.preventDefault();
+    if (node.id !== rootId) {
+      setNodeToDelete(node.id);
+      setShowModal(true);
+    }
+  }, [rootId]);
+
+  // Modal confirm/cancel handlers
+  const handleConfirmDelete = () => {
+    if (nodeToDelete) {
+      deleteNodeAndDescendants(nodeToDelete);
+    }
+    setShowModal(false);
+    setNodeToDelete(null);
+  };
+  const handleCancelDelete = () => {
+    setShowModal(false);
+    setNodeToDelete(null);
+  };
+
   return (
     <div className={styles.container}>
       <ReactFlow
@@ -199,9 +227,25 @@ const MoveTreeFlow: FC<MoveTreeFlowProps> = ({ moveTree, selectedNodeId, onNodeS
         fitViewOptions={{ padding: .25 }}
         style={{ width: '100%', height: '100%' }}
         onNodeClick={handleNodeClick}
+        onNodeContextMenu={handleNodeContextMenu}
       >
         <Controls className={styles['react-flow__controls']} />
       </ReactFlow>
+      {showModal && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+          background: 'rgba(0,0,0,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
+        }}>
+          <div style={{ background: 'white', padding: 24, borderRadius: 8, boxShadow: '0 2px 16px rgba(0,0,0,0.2)' }}>
+            <h3>Delete this node and all its descendants?</h3>
+            <p>This action cannot be undone. Are you sure?</p>
+            <div style={{ display: 'flex', gap: 16, justifyContent: 'flex-end', marginTop: 16 }}>
+              <button onClick={handleCancelDelete}>Cancel</button>
+              <button onClick={handleConfirmDelete} style={{ background: '#e53935', color: 'white' }}>Delete</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
