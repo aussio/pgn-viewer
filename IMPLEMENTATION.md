@@ -104,15 +104,36 @@ This document outlines the steps to build a structured, interactive, and navigab
 
 ### 7.1. Enable Editing of MoveTree via Chessboard
 
-- [ ] Allow users to play moves directly on the chessboard UI.
-- [ ] When a move is played:
+- [x] Allow users to play moves directly on the chessboard UI.
+- [x] When a move is played:
   - If the move already exists as a child of the current node, update `currentNode` to that child (no tree modification).
   - If the move does not exist and the current node is the end of its branch, add the move as a new child (continuing the current variation).
   - If the move does not exist and the current node is not at the end of its branch, create a new variation/branch starting from the current node with the new move.
-- [ ] Update the MoveTree and Zustand store accordingly.
-- [ ] Ensure the UI (chessboard, move list, tree view) updates in response to edits.
-- [ ] (Optional) Add ability to delete nodes/moves from the tree.
-- [ ] **Write tests** for all editing scenarios (add, branch, delete).
+- [x] Update the MoveTree and Zustand store accordingly.
+- [x] Ensure the UI (chessboard, move list, tree view) updates in response to edits.
+- [x] (Optional) Add ability to delete nodes/moves from the tree.
+- [x] **Write tests** for all editing scenarios (add, branch, delete).
+
+---
+
+## 8. Saving and Loading Move Trees (with File Export/Import)
+
+### 8.1. In-Browser SQL Database (SQLite via sql.js)
+- [ ] Integrate sql.js to provide an in-browser SQLite database.
+- [ ] Define a table schema for studies/trees, with at least:
+  - id (primary key)
+  - name (study name)
+  - pgn (PGN string for the tree)
+  - created_at, updated_at
+- [ ] Implement logic to save the current MoveTree as a PGN string into the database.
+- [ ] Implement logic to load a MoveTree from a selected row in the database.
+- [ ] Support multiple studies/trees in the database (library view).
+
+### 8.2. File Export/Import
+- [ ] Implement export: allow users to download the SQLite database file (or a single study as PGN) for backup or transfer.
+- [ ] Implement import: allow users to upload a previously exported database file (or PGN) to restore studies/trees.
+- [ ] Ensure import/export works across devices and browsers.
+- [ ] Document the process and UI for users.
 
 ---
 
